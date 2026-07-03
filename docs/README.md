@@ -32,7 +32,7 @@
 - COBYLA/HEA (N=9): E₀ = −1.28456 (9.66% error, 801 evaluations)
 - Mean single-site entropy: 0.9066 bits (near-maximal spin liquid signature)
 - Sublattice MI I(A:B): 3.689 bits
-- SOC QAOA: p=2 recovers global optimum — Mn₃Sn + CrTe₂ + Bi₂Se₃ (θ_SH = 4.263)
+- SOC QAOA: greedy/SA reach oracle optimum (θ_SH ≈ 4.26); best QAOA is p=1/2 at 3.05
 - Scaling (NB05): N=12 VQE error 18.70%, gradient variance barren plateau confirmed
 
 ---

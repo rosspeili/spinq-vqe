@@ -139,13 +139,15 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 
 | Method | Total θ_SH | Selected |
 |--------|-----------|----------|
-| QAOA p=1 | 3.080 | W, Ta, Bi₂Se₃ (sub-optimal) |
-| **QAOA p=2** | **4.263** | **Mn₃Sn, CrTe₂, Bi₂Se₃** |
-| QAOA p=3 | 4.263 | Mn₃Sn, CrTe₂, Bi₂Se₃ |
-| Greedy | 4.263 | Bi₂Se₃, CrTe₂, Mn₃Sn |
+| QAOA p=1 | 3.049 | W, Ta, Bi₂Se₃ (sub-optimal) |
+| QAOA p=2 | 3.049 | W, Ta, Bi₂Se₃ |
+| QAOA p=3 | −0.451 | W, Ta, Pd |
+| **Greedy** | **4.259** | **Bi₂Se₃, CrTe₂, Mn₃Sn** |
+| Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ |
 
-QAOA p≥2 recovers the global optimum, matching greedy exactly.
-p=1 (single layer) is insufficient for 12 qubits — as expected for shallow QAOA.
+With MP-grounded structure descriptors (`data/mp_theta_sh.csv`), classical
+baselines beat QAOA on the surrogate oracle. QAOA p=1/2 tie as the best
+quantum run; p=3 does not improve the selection on this 12-material problem.
 
 <table>
 <tr>

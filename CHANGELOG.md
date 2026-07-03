@@ -22,6 +22,12 @@ and this project uses semantic versioning through the package version in
 - `fetch_curated_mp_dataset()` replaces stub `load_mp_data()` — correct MP IDs
   by formula, literature θ_SH (#5).
 
+### Fixed
+
+- NB04: `ax.axhline` placeholder and `greedy["total"]` dict access after
+  `classical_greedy` return-type change; regenerated figures and
+  `data/qaoa_results.csv` with MP-grounded CSV inputs.
+
 ### Added
 
 - Committed `data/mp_theta_sh.csv` — 12 spintronic materials with MP structure

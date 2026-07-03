@@ -63,10 +63,11 @@ The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficie
 
 | Method | Total θ_SH | Selected | Notes |
 |--------|-----------|----------|-------|
-| QAOA p=1 | 3.080 | W, Ta, Bi₂Se₃ | Shallow circuit — sub-optimal |
-| **QAOA p=2** | **4.263** | **Mn₃Sn, CrTe₂, Bi₂Se₃** | Matches global optimum |
-| QAOA p=3 | 4.263 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Confirms p=2 result |
-| Greedy (classical) | 4.263 | Bi₂Se₃, CrTe₂, Mn₃Sn | Optimal baseline |
+| QAOA p=1 | 3.049 | W, Ta, Bi₂Se₃ | Best QAOA depth — still sub-optimal |
+| QAOA p=2 | 3.049 | W, Ta, Bi₂Se₃ | Same selection as p=1 |
+| QAOA p=3 | −0.451 | W, Ta, Pd | Deeper circuit — worse on this oracle |
+| **Greedy (classical)** | **4.259** | **Bi₂Se₃, CrTe₂, Mn₃Sn** | Optimal on surrogate oracle |
+| Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Matches greedy |
 
 ---
 

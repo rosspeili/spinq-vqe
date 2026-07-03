@@ -35,7 +35,7 @@ tests/
 ├── test_ansatz.py          # HEA, HVA, MERA param counts + circuit execution
 ├── test_vqe.py             # COBYLA and Adam VQE runners
 ├── test_entanglement.py    # Reduced density matrix + Von Neumann entropy
-├── test_surrogate.py       # Mock data, feature extraction, MLP training, prediction
+├── test_surrogate.py       # CSV + mock data, feature extraction, MLP training, prediction
 └── test_qaoa.py            # Cost/mixer Hamiltonians, QAOA run, classical greedy
 ```
 
@@ -51,7 +51,7 @@ All tests use **N=3** (one Kagome unit cell, 3 sites) or **N=4** (QAOA) with min
 | `ansatz.py` | `test_ansatz.py` | HEA/HVA/MERA parameter counts (exact), `init_params` reproducibility and scale, circuit execution → normalized statevector |
 | `vqe.py` | `test_vqe.py` | `VQEResult` fields, COBYLA: energy finiteness, history length, gradient variance empty, statevector shape/normalization, metadata; Adam: grad variance non-empty |
 | `entanglement.py` | `test_entanglement.py` | RDM shape/trace/hermiticity/PSD, entropy = 0 for product state, entropy = 1 for Bell pair, upper bound, base conversion |
-| `surrogate.py` | `test_surrogate.py` | 12 mock records, Mn₃Sn present, θ_SH finite, feature matrix shape, training, prediction shape and finiteness |
+| `surrogate.py` | `test_surrogate.py` | CSV load (`mp_theta_sh.csv`), mock fallback, Mn₃Sn + real MP ID, feature matrix, training, prediction |
 | `qaoa.py` | `test_qaoa.py` | Cost/mixer Hamiltonian types, QAOA result structure, k constraint (exactly k selected), classical greedy top-k |
 
 ---
