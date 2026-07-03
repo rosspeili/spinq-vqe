@@ -11,8 +11,9 @@ fast oracle for the QAOA composition optimizer in ``qaoa.py``.
 
 Pipeline
 --------
-1. ``load_mp_data()``       — fetch from Materials Project API (requires mp-api key)
-   or ``load_mock_data()`` — curated literature values (offline / testing)
+1. ``load_theta_sh_data()``  — load committed CSV (default for NB04)
+2. ``load_mp_data()``        — fetch from Materials Project API (refresh only)
+   or ``load_mock_data()``   — offline fallback for unit tests
 2. ``build_features()``     — extract numerical descriptors from raw MP records
 3. ``train_surrogate()``    — fit sklearn MLPRegressor + StandardScaler
 4. ``predict()``            — predict θ_SH for new compositions
@@ -33,8 +34,11 @@ References
 
 from __future__ import annotations
 
+import csv
+import os
 import warnings
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -141,38 +145,145 @@ class TrainedSurrogate:
 # Data loading
 # ---------------------------------------------------------------------------
 
-# Curated literature values (used when MP API is unavailable)
+# Repo-root path: src/spinq_vqe/surrogate.py → parents[2] == repo root
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_THETA_SH_CSV = _REPO_ROOT / "data" / "mp_theta_sh.csv"
+
+CSV_COLUMNS = [
+    "mp_id", "formula", "crystal_system", "space_group", "z_max", "n_elements",
+    "ahc", "theta_sh", "theta_sh_source", "band_gap", "is_magnetic", "source",
+]
+
+# 12 spintronic candidates: θ_SH and AHC from literature (MP has no θ_SH field).
+CURATED_LITERATURE: list[dict[str, Any]] = [
+    {"formula": "Mn3Sn",   "theta_sh":  0.35, "ahc": 200.0},
+    {"formula": "Pt",      "theta_sh":  0.08, "ahc":   0.0},
+    {"formula": "W",       "theta_sh": -0.33, "ahc":   0.0},
+    {"formula": "Ta",      "theta_sh": -0.12, "ahc":   0.0},
+    {"formula": "Pd",      "theta_sh":  0.01, "ahc":   0.0},
+    {"formula": "Au",      "theta_sh":  0.11, "ahc":   0.0},
+    {"formula": "Co2MnGa", "theta_sh":  0.20, "ahc": 1600.0},
+    {"formula": "Fe3Sn",   "theta_sh":  0.25, "ahc": 450.0},
+    {"formula": "IrMn3",   "theta_sh":  0.18, "ahc":   0.0},
+    {"formula": "CrTe2",   "theta_sh":  0.40, "ahc": 320.0},
+    {"formula": "MnPt",    "theta_sh":  0.15, "ahc": 150.0},
+    {"formula": "Bi2Se3",  "theta_sh":  3.50, "ahc":   0.0},
+]
+
+# Offline test fallback (no CSV, no API).
 _MOCK_DATA: list[dict] = [
-    {"mp_id": "mp-989807", "formula": "Mn3Sn",   "crystal_system": "hexagonal",
-     "z_max": 50, "n_elements": 2, "space_group": 194, "ahc": 200.0, "theta_sh":  0.35},
-    {"mp_id": "mp-124",    "formula": "Pt",       "crystal_system": "cubic",
-     "z_max": 78, "n_elements": 1, "space_group": 225, "ahc":   0.0, "theta_sh":  0.08},
-    {"mp_id": "mp-91",     "formula": "W",        "crystal_system": "cubic",
-     "z_max": 74, "n_elements": 1, "space_group": 229, "ahc":   0.0, "theta_sh": -0.33},
-    {"mp_id": "mp-104",    "formula": "Ta",       "crystal_system": "cubic",
-     "z_max": 73, "n_elements": 1, "space_group": 229, "ahc":   0.0, "theta_sh": -0.12},
-    {"mp_id": "mp-2",      "formula": "Pd",       "crystal_system": "cubic",
-     "z_max": 46, "n_elements": 1, "space_group": 225, "ahc":   0.0, "theta_sh":  0.01},
-    {"mp_id": "mp-81",     "formula": "Au",       "crystal_system": "cubic",
-     "z_max": 79, "n_elements": 1, "space_group": 225, "ahc":   0.0, "theta_sh":  0.11},
-    {"mp_id": "mp-22598",  "formula": "Co2MnGa",  "crystal_system": "cubic",
-     "z_max": 31, "n_elements": 3, "space_group": 225, "ahc": 1600.0, "theta_sh":  0.20},
-    {"mp_id": "mp-541837", "formula": "Fe3Sn",    "crystal_system": "hexagonal",
-     "z_max": 50, "n_elements": 2, "space_group": 194, "ahc": 450.0, "theta_sh":  0.25},
-    {"mp_id": "mp-20305",  "formula": "IrMn3",    "crystal_system": "cubic",
-     "z_max": 77, "n_elements": 2, "space_group": 221, "ahc":   0.0, "theta_sh":  0.18},
-    {"mp_id": "mp-976411", "formula": "CrTe2",    "crystal_system": "trigonal",
-     "z_max": 52, "n_elements": 2, "space_group": 164, "ahc": 320.0, "theta_sh":  0.40},
-    {"mp_id": "mp-22189",  "formula": "MnPt",     "crystal_system": "tetragonal",
-     "z_max": 78, "n_elements": 2, "space_group": 123, "ahc": 150.0, "theta_sh":  0.15},
-    {"mp_id": "mp-30811",  "formula": "Bi2Se3",   "crystal_system": "trigonal",
-     "z_max": 83, "n_elements": 2, "space_group": 166, "ahc":   0.0, "theta_sh":  3.50},
+    {"mp_id": "mp-mock", "formula": e["formula"], "crystal_system": "unknown",
+     "z_max": 50, "n_elements": 2, "space_group": 1,
+     "ahc": e["ahc"], "theta_sh": e["theta_sh"]}
+    for e in CURATED_LITERATURE
 ]
 
 _CRYSTAL_SYSTEM_MAP = {
     "cubic": 0, "hexagonal": 1, "trigonal": 2, "tetragonal": 3,
     "orthorhombic": 4, "monoclinic": 5, "triclinic": 6,
 }
+
+
+def _crystal_system_str(symmetry: Any) -> str:
+    if symmetry is None:
+        return "unknown"
+    cs = symmetry.crystal_system
+    if hasattr(cs, "value"):
+        return str(cs.value).lower()
+    return str(cs).lower()
+
+
+def _record_to_csv_row(
+    r: MaterialRecord,
+    *,
+    theta_sh_source: str = "literature",
+    band_gap: float | None = None,
+    is_magnetic: bool | None = None,
+) -> dict:
+    return {
+        "mp_id": r.mp_id,
+        "formula": r.formula,
+        "crystal_system": r.crystal_system,
+        "space_group": r.space_group,
+        "z_max": r.z_max,
+        "n_elements": r.n_elements,
+        "ahc": r.ahc,
+        "theta_sh": r.theta_sh,
+        "theta_sh_source": theta_sh_source,
+        "band_gap": "" if band_gap is None else band_gap,
+        "is_magnetic": "" if is_magnetic is None else is_magnetic,
+        "source": r.source,
+    }
+
+
+def _csv_row_to_record(row: dict[str, str]) -> MaterialRecord:
+    return MaterialRecord(
+        mp_id=row["mp_id"],
+        formula=row["formula"],
+        crystal_system=row["crystal_system"],
+        z_max=int(float(row["z_max"])),
+        n_elements=int(float(row["n_elements"])),
+        space_group=int(float(row["space_group"])),
+        ahc=float(row["ahc"]),
+        theta_sh=float(row["theta_sh"]),
+        source=row.get("source", "csv"),
+    )
+
+
+def save_theta_sh_csv(
+    dataset: SurrogateDataset,
+    path: Path | str = DEFAULT_THETA_SH_CSV,
+    *,
+    extra: list[dict] | None = None,
+) -> Path:
+    """Write a SurrogateDataset to ``data/mp_theta_sh.csv``."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    extras = extra or [{}] * len(dataset.records)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
+        writer.writeheader()
+        for r, meta in zip(dataset.records, extras):
+            writer.writerow(_record_to_csv_row(
+                r,
+                theta_sh_source=meta.get("theta_sh_source", "literature"),
+                band_gap=meta.get("band_gap"),
+                is_magnetic=meta.get("is_magnetic"),
+            ))
+    return path
+
+
+def load_theta_sh_csv(path: Path | str = DEFAULT_THETA_SH_CSV) -> SurrogateDataset:
+    """Load the committed θ_SH dataset from CSV."""
+    path = Path(path)
+    if not path.is_file():
+        raise FileNotFoundError(f"theta_SH CSV not found: {path}")
+    records: list[MaterialRecord] = []
+    with path.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            records.append(_csv_row_to_record(row))
+    return SurrogateDataset(records=records)
+
+
+def load_theta_sh_data(path: Path | str | None = None) -> SurrogateDataset:
+    """
+    Load the spintronic θ_SH dataset (primary entry point for NB04).
+
+    Reads ``data/mp_theta_sh.csv``. Falls back to ``load_mock_data()`` with a
+    warning if the CSV is missing (unit tests only).
+    """
+    csv_path = Path(path) if path is not None else DEFAULT_THETA_SH_CSV
+    try:
+        ds = load_theta_sh_csv(csv_path)
+        print(f"Loaded {ds.n_samples} materials from {csv_path.name}.")
+        return ds
+    except FileNotFoundError:
+        warnings.warn(
+            f"{csv_path} not found — using offline mock data. "
+            "Run: python scripts/fetch_mp_theta_sh.py to generate the CSV.",
+            stacklevel=2,
+        )
+        return load_mock_data()
 
 
 def load_mock_data() -> SurrogateDataset:
@@ -193,71 +304,110 @@ def load_mock_data() -> SurrogateDataset:
     return SurrogateDataset(records=records)
 
 
-def load_mp_data(
-    api_key: str,
-    elements: list[str] | None = None,
-    n_results: int = 50,
-) -> SurrogateDataset:
+def fetch_curated_mp_dataset(api_key: str | None = None) -> tuple[SurrogateDataset, list[dict]]:
     """
-    Fetch spin Hall / anomalous Hall data from the Materials Project API.
+    Fetch MP structure descriptors for the 12 curated spintronic materials.
+
+    θ_SH and AHC come from ``CURATED_LITERATURE`` (MP does not expose θ_SH).
+    For each formula, picks the lowest-energy-above-hull MP entry.
 
     Parameters
     ----------
-    api_key : str
-        Materials Project API key (get one at materialsproject.org).
-    elements : list of str, optional
-        Filter to materials containing only these elements.
-        E.g. ['Mn', 'Sn', 'Fe', 'Co', 'Pt', 'W', 'Ta'].
-        Defaults to a curated set of spintronic elements.
-    n_results : int
-        Maximum number of materials to fetch.
+    api_key : str, optional
+        Materials Project API key. Defaults to ``MP_API_KEY`` env var.
+
+    Returns
+    -------
+    dataset : SurrogateDataset
+    extra : list of dict
+        Per-row metadata (band_gap, is_magnetic, theta_sh_source) for CSV export.
+    """
+    if not MP_API_AVAILABLE:
+        raise ImportError(
+            "mp-api is not installed. Run: pip install mp-api"
+        )
+
+    key = api_key or os.environ.get("MP_API_KEY")
+    if not key:
+        raise ValueError(
+            "Materials Project API key required. Set MP_API_KEY in .env or pass api_key=."
+        )
+
+    from pymatgen.core import Element
+
+    records: list[MaterialRecord] = []
+    extra_rows: list[dict] = []
+
+    with MPRester(key) as mpr:
+        for entry in CURATED_LITERATURE:
+            formula = entry["formula"]
+            docs = mpr.materials.summary.search(
+                formula=formula,
+                fields=[
+                    "material_id", "formula_pretty", "elements", "nelements",
+                    "symmetry", "band_gap", "is_magnetic", "energy_above_hull",
+                ],
+                num_chunks=1,
+                chunk_size=10,
+            )
+            if not docs:
+                warnings.warn(f"No MP entry found for formula {formula!r}")
+                continue
+
+            best = min(docs, key=lambda d: (d.energy_above_hull or 999.0))
+            z_max = max(Element(e).Z for e in best.elements)
+            sg = best.symmetry.number if best.symmetry else 1
+
+            records.append(MaterialRecord(
+                mp_id=str(best.material_id),
+                formula=best.formula_pretty,
+                crystal_system=_crystal_system_str(best.symmetry),
+                z_max=z_max,
+                n_elements=best.nelements,
+                space_group=sg,
+                ahc=float(entry["ahc"]),
+                theta_sh=float(entry["theta_sh"]),
+                source="mp_api",
+            ))
+            extra_rows.append({
+                "theta_sh_source": "literature",
+                "band_gap": best.band_gap,
+                "is_magnetic": best.is_magnetic,
+            })
+
+    if not records:
+        raise RuntimeError("No materials fetched from Materials Project.")
+
+    print(f"Fetched {len(records)} curated materials from Materials Project.")
+    return SurrogateDataset(records=records), extra_rows
+
+
+def load_mp_data(api_key: str | None = None) -> SurrogateDataset:
+    """
+    Fetch the curated spintronic dataset from the Materials Project API.
+
+    Prefer ``load_theta_sh_data()`` for notebook runs (uses committed CSV).
+    Use this only to refresh data or when building the CSV for the first time.
+
+    Parameters
+    ----------
+    api_key : str, optional
+        Materials Project API key. Defaults to ``MP_API_KEY`` environment variable.
 
     Returns
     -------
     SurrogateDataset
-        Records with AHC from MP. θ_SH is estimated as θ_SH ≈ AHC * ρ_xx
-        where ρ_xx is a typical metallic resistivity (100 μΩ·cm).
+        Records with MP descriptors and literature θ_SH values.
 
     Raises
     ------
     ImportError
-        If mp-api is not installed (``pip install mp-api``).
+        If mp-api is not installed.
+    ValueError
+        If no API key is available.
     """
-    if not MP_API_AVAILABLE:
-        raise ImportError(
-            "mp-api is not installed. Run: pip install mp-api\n"
-            "Or use load_mock_data() for the curated offline dataset."
-        )
-
-    if elements is None:
-        elements = ["Mn", "Sn", "Fe", "Co", "Ni", "Pt", "W", "Ta", "Pd", "Ir", "Cr"]
-
-    records: list[MaterialRecord] = []
-    with MPRester(api_key) as mpr:
-        docs = mpr.materials.summary.search(
-            elements=elements,
-            fields=["material_id", "formula_pretty", "crystal_system",
-                    "elements", "space_group", "structure"],
-            num_chunks=1,
-            chunk_size=n_results,
-        )
-        for doc in docs[:n_results]:
-            z_vals = [e.Z for e in doc.structure.composition.elements]
-            records.append(MaterialRecord(
-                mp_id=str(doc.material_id),
-                formula=doc.formula_pretty,
-                crystal_system=doc.crystal_system.value.lower()
-                    if hasattr(doc.crystal_system, "value") else str(doc.crystal_system),
-                z_max=max(z_vals),
-                n_elements=len(z_vals),
-                space_group=doc.space_group.number if doc.space_group else 1,
-                ahc=0.0,           # AHC requires a separate electronic transport query
-                theta_sh=0.0,      # Will be estimated or left for NB04
-                source="mp_api",
-            ))
-
-    print(f"Loaded {len(records)} records from Materials Project.")
-    return SurrogateDataset(records=records)
+    dataset, _ = fetch_curated_mp_dataset(api_key)
+    return dataset
 
 
 # ---------------------------------------------------------------------------

@@ -15,8 +15,11 @@ from spinq_vqe.surrogate import (
     MaterialRecord,
     SurrogateDataset,
     TrainedSurrogate,
+    DEFAULT_THETA_SH_CSV,
     build_features,
     load_mock_data,
+    load_theta_sh_csv,
+    load_theta_sh_data,
     predict,
     train_surrogate,
 )
@@ -60,6 +63,26 @@ class TestLoadMockData:
         ds = load_mock_data()
         for r in ds.records:
             assert r.source == "mock"
+
+
+class TestLoadThetaShCsv:
+    def test_csv_exists(self):
+        assert DEFAULT_THETA_SH_CSV.is_file()
+
+    def test_loads_12_records(self):
+        ds = load_theta_sh_csv()
+        assert ds.n_samples == 12
+
+    def test_mn3sn_present_with_real_mp_id(self):
+        ds = load_theta_sh_csv()
+        mn = next(r for r in ds.records if r.formula == "Mn3Sn")
+        assert mn.mp_id == "mp-22389"
+        assert mn.theta_sh == pytest.approx(0.35)
+
+    def test_load_theta_sh_data_uses_csv(self):
+        ds = load_theta_sh_data()
+        assert ds.n_samples == 12
+        assert ds.records[0].source in ("csv", "mp_api")
 
 
 # ---------------------------------------------------------------------------

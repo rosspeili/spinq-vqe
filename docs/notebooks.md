@@ -120,7 +120,7 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 
 **File:** [`04_soc_qaoa.ipynb`](../notebooks/04_soc_qaoa.ipynb)  
 **What it does:**
-- Loads mock θ_SH dataset (12 spintronic materials, offline, no API key needed)
+- Loads θ_SH dataset from `data/mp_theta_sh.csv` (12 spintronic materials; MP descriptors + literature θ_SH)
 - Trains MLP surrogate (`surrogate.train_surrogate`)
 - Scatter plot: actual vs predicted θ_SH
 - Formulates k=3 from N=12 selection as QUBO with constraint penalty λ=6

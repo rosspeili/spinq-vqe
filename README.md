@@ -65,6 +65,14 @@ conda activate spinq-vqe
 Requires Python ≥ 3.11. Core: `pennylane ≥ 0.39`, `numpy`, `scipy`, `networkx`, `matplotlib`.  
 Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (for SOC QAOA notebooks).
 
+**SOC QAOA data (NB04):** uses committed `data/mp_theta_sh.csv` (no API key needed). To refresh from Materials Project:
+
+```bash
+cp .env.example .env          # add MP_API_KEY from materialsproject.org/api
+pip install -e ".[data]"
+python scripts/fetch_mp_theta_sh.py
+```
+
 ## Notebooks
 
 | # | Notebook | Notes |

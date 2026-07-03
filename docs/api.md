@@ -148,21 +148,31 @@ from spinq_vqe import surrogate
 
 | Function | Description |
 |----------|-------------|
-| `load_mock_data()` | 12-material curated dataset (offline, no API key) |
-| `load_mp_data(api_key, elements, n_results)` | Fetch from Materials Project API |
+| `load_theta_sh_data()` | **Primary** — load `data/mp_theta_sh.csv` (committed, no API key) |
+| `load_theta_sh_csv(path)` | Load CSV directly |
+| `load_mock_data()` | Offline fallback for unit tests only |
+| `fetch_curated_mp_dataset(api_key)` | Fetch MP descriptors + literature θ_SH (refresh) |
+| `load_mp_data(api_key)` | Same as fetch, returns dataset only |
+| `save_theta_sh_csv(dataset, path, extra)` | Write CSV after a refresh |
 | `build_features(dataset)` | Extract feature matrix `(N, 6)` |
 | `train_surrogate(dataset, ...)` | Fit sklearn MLP (or numpy ridge fallback) |
 | `predict(surrogate, records)` | Predict θ_SH for new records |
 | `surrogate_summary(surrogate)` | Print model info + CV R² |
 
 ```python
-ds = surrogate.load_mock_data()        # or load_mp_data(api_key)
+ds = surrogate.load_theta_sh_data()    # uses data/mp_theta_sh.csv
 sr = surrogate.train_surrogate(ds)
-surrogate.surrogate_summary(sr)        # sklearn MLP | features: 6 | CV R²: ...
+surrogate.surrogate_summary(sr)
 theta_sh = surrogate.predict(sr, ds.records)
 ```
 
-**Optional deps:** `scikit-learn` (MLP), `mp-api` (MP fetch). Falls back to numpy ridge if sklearn missing. Install: `pip install -e ".[data]"`.
+Refresh CSV (optional, requires `MP_API_KEY` in `.env`):
+
+```bash
+python scripts/fetch_mp_theta_sh.py
+```
+
+**Optional deps:** `scikit-learn` (MLP), `mp-api` (MP refresh only). Install: `pip install -e ".[data]"`.
 
 ---
 

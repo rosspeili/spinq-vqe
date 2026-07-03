@@ -18,6 +18,17 @@ and this project uses semantic versioning through the package version in
   in NB04/NB05 (#3).
 - Updated `src/spinq_vqe/__init__.py` module descriptions for `surrogate` and
   `qaoa` to behaviour-focused wording with no internal cluster codes (#4).
+- NB04 uses `load_theta_sh_data()` instead of hardcoded mock data (#5).
+- `fetch_curated_mp_dataset()` replaces stub `load_mp_data()` — correct MP IDs
+  by formula, literature θ_SH (#5).
+
+### Added
+
+- Committed `data/mp_theta_sh.csv` — 12 spintronic materials with MP structure
+  descriptors and literature θ_SH labels (#5).
+- `load_theta_sh_data()` CSV-first loader; `scripts/fetch_mp_theta_sh.py` to
+  refresh data via Materials Project API when `MP_API_KEY` is set (#5).
+- `.env.example` for optional MP API key; `.env` added to `.gitignore` (#5).
 
 ## [0.1.1] - 2026-07-03
 

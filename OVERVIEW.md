@@ -32,7 +32,7 @@ The pipeline builds the lattice graph (NetworkX), maps spin operators to Pauli s
 
 ### SOC material screening via QAOA
 
-The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficiency. Selecting the top-k materials from N candidates is a combinatorial optimization problem, solved here with **QAOA** using a classical **MLP surrogate** as the oracle (trained on a 12-material mock dataset; Materials Project API supported via `load_mp_data()`).
+The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficiency. Selecting the top-k materials from N candidates is a combinatorial optimization problem, solved here with **QAOA** using a classical **MLP surrogate** as the oracle (trained on a 12-material dataset in `data/mp_theta_sh.csv`; optional refresh via Materials Project API).
 
 **Decisions made in this release:** classical surrogate oracle (not raw DFT per evaluation); QAOA depths p = 1, 2, 3 compared against greedy and simulated-annealing baselines; k = 3 selected from N = 12 materials.
 
@@ -100,7 +100,7 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 ## What's next
 
 - **DMRG comparison** — benchmark VQE against density-matrix renormalization group at larger system sizes
-- **Real Materials Project data** — replace mock surrogate training set with live `mp-api` fetches
+- **Expand θ_SH dataset** — add materials or refresh descriptors via `scripts/fetch_mp_theta_sh.py`
 - **2D periodic Kagome tiling** — extend beyond the 1D strip geometry
 - **Paper draft** — LaTeX manuscript targeting Physical Review B or npj Quantum Materials
 

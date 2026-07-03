@@ -28,6 +28,7 @@ htmlcov/
 .coverage
 
 # OS
+.env
 .DS_Store
 Thumbs.db
 
