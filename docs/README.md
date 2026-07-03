@@ -12,6 +12,7 @@
 | [Ansatz guide](ansatze.md) | HVA, HEA, MERA — what they are, which to use, why |
 | [API reference](api.md) | Module-level reference for `spinq_vqe` |
 | [Notebook guide](notebooks.md) | What each notebook does, how to run, expected outputs |
+| [Testing guide](testing.md) | Running tests, coverage map, fixtures, extending |
 
 ---
 

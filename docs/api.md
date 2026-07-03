@@ -179,7 +179,7 @@ from spinq_vqe import qaoa
 | `build_cost_hamiltonian(theta_sh, k, lam)` | QUBO cost Hamiltonian |
 | `build_mixer_hamiltonian(n_materials)` | Transverse-field X mixer |
 | `run_qaoa(theta_sh, k, p, ...)` | Full QAOA optimization (COBYLA) |
-| `classical_greedy(theta_sh, k)` | Top-k greedy baseline |
+| `classical_greedy(theta_sh, k)` | Top-k greedy baseline → `list[int]` of selected indices |
 | `classical_simulated_annealing(theta_sh, k, ...)` | SA baseline |
 | `qaoa_summary(result, formulas)` | Print result summary |
 

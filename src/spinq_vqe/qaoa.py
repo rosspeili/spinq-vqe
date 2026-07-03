@@ -35,7 +35,7 @@ Pipeline
 2. ``build_mixer_hamiltonian(n_materials)``       — build H_M
 3. ``run_qaoa(theta_sh, k, p, ...)``              — full QAOA optimization
 4. ``sample_bitstrings(result, n_shots)``          — sample from optimized circuit
-5. ``classical_greedy(theta_sh, k)``              — greedy baseline comparison
+5. ``classical_greedy(theta_sh, k)``              — greedy baseline comparison → ``list[int]``
 6. ``classical_simulated_annealing(theta_sh, k)`` — SA baseline comparison
 
 References
@@ -304,8 +304,10 @@ def run_qaoa(
     selected_theta = float(np.sum(theta_sh[selected]))
 
     if verbose:
+        greedy_indices = classical_greedy(theta_sh, k)
+        greedy_total = float(np.sum(theta_sh[greedy_indices]))
         print(f"\nSelected: {[int(i) for i in selected]}")
-        print(f"Total theta_SH: {selected_theta:.4f}  (greedy: {classical_greedy(theta_sh, k)['total']:.4f})")
+        print(f"Total theta_SH: {selected_theta:.4f}  (greedy: {greedy_total:.4f})")
 
     return QAOAResult(
         energy=best_energy,
@@ -363,7 +365,7 @@ def _decode_selection(
 # ---------------------------------------------------------------------------
 
 
-def classical_greedy(theta_sh: np.ndarray, k: int) -> dict:
+def classical_greedy(theta_sh: np.ndarray, k: int) -> list[int]:
     """
     Greedy baseline: select the k materials with highest θ_SH.
 
@@ -374,14 +376,11 @@ def classical_greedy(theta_sh: np.ndarray, k: int) -> dict:
 
     Returns
     -------
-    dict with keys 'selected_indices', 'total', 'values'
+    list of int
+        Indices of the k materials with the highest θ_SH, sorted descending.
     """
     selected = np.argsort(theta_sh)[::-1][:k].tolist()
-    return {
-        "selected_indices": [int(i) for i in selected],
-        "total": float(np.sum(theta_sh[selected])),
-        "values": theta_sh[selected].tolist(),
-    }
+    return [int(i) for i in selected]
 
 
 def classical_simulated_annealing(
