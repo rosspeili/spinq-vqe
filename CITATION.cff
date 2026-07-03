@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians"
-version: "0.1.1"
-date-released: 2026-06-01
+version: "0.1.2"
+date-released: 2026-07-03
 url: "https://github.com/ARPAQLS/spinq-vqe"
 repository-code: "https://github.com/ARPAQLS/spinq-vqe"
 license: MIT
