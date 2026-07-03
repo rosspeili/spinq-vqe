@@ -8,6 +8,8 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-07-03
+
 ### Changed
 
 - Rewrote `OVERVIEW.md` as a public-facing research narrative with key results,

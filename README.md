@@ -41,7 +41,8 @@ spinq-vqe/
 │   └── qaoa.py          # QAOA circuit + optimizer for material selection
 ├── notebooks/           # Executable research notebooks
 ├── figures/             # Generated plots
-├── data/                # ED reference energies, VQE results, statevectors
+├── data/                # ED/VQE/QAOA CSVs, mp_theta_sh.csv, statevectors
+├── scripts/             # fetch_mp_theta_sh.py — refresh MP dataset (optional)
 ├── docs/                # Guides and API reference → docs/README.md
 ├── OVERVIEW.md          # Full program description + research context
 └── REFERENCES.md        # Full bibliography (50+ references)
