@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/qondra_spin_vqe_logo.png" alt="QONDRA Spin VQE" width="500">
+<img src="docs/QONDRA_SPINQ_VQE_SPLASH.png" alt="QONDRA spinq-vqe" width="600">
 
 **Variational Quantum Simulation of Antiferromagnetic Hamiltonians**
 
@@ -54,6 +54,12 @@ python -m venv .venv
 .venv\Scripts\activate        # Windows
 source .venv/bin/activate     # Linux / macOS
 pip install -e ".[dev]"
+```
+
+**Conda users:**
+```bash
+conda env create -f environment.yml
+conda activate spinq-vqe
 ```
 
 Requires Python ≥ 3.11. Core: `pennylane ≥ 0.39`, `numpy`, `scipy`, `networkx`, `matplotlib`.  
@@ -113,9 +119,19 @@ Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (fo
 
 <img src="figures/qaoa_material_ranking.png" alt="QAOA material ranking" width="560">
 
+## Tests
+
+```bash
+pip install -e ".[dev]"
+pytest tests/ -v
+```
+
+Six test modules covering all library functions. Runs in under 90 seconds on CPU. See [`docs/testing.md`](docs/testing.md) for the full guide.
+
 ## Docs
 
-→ [`docs/`](docs/README.md) — physics background, ansatz guide, API reference, notebook guide.
+→ [`docs/README.md`](docs/README.md) — physics background, ansatz guide, API reference, notebook guide.  
+→ [`docs/testing.md`](docs/testing.md) — test suite guide, coverage map, extending tests.
 
 ## References
 
