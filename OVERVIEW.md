@@ -32,7 +32,7 @@ The pipeline builds the lattice graph (NetworkX), maps spin operators to Pauli s
 
 ### SOC material screening via QAOA
 
-The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficiency. Selecting the top-k materials from N candidates is a combinatorial optimization problem, solved here with **QAOA** using a classical **MLP surrogate** as the oracle (trained on a 12-material mock dataset; Materials Project API supported via `load_mp_data()`).
+The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficiency. Selecting the top-k materials from N candidates is a combinatorial optimization problem, solved here with **QAOA** using a classical **MLP surrogate** as the oracle (trained on a 12-material dataset in `data/mp_theta_sh.csv`; optional refresh via Materials Project API).
 
 **Decisions made in this release:** classical surrogate oracle (not raw DFT per evaluation); QAOA depths p = 1, 2, 3 compared against greedy and simulated-annealing baselines; k = 3 selected from N = 12 materials.
 
@@ -63,10 +63,11 @@ The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficie
 
 | Method | Total θ_SH | Selected | Notes |
 |--------|-----------|----------|-------|
-| QAOA p=1 | 3.080 | W, Ta, Bi₂Se₃ | Shallow circuit — sub-optimal |
-| **QAOA p=2** | **4.263** | **Mn₃Sn, CrTe₂, Bi₂Se₃** | Matches global optimum |
-| QAOA p=3 | 4.263 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Confirms p=2 result |
-| Greedy (classical) | 4.263 | Bi₂Se₃, CrTe₂, Mn₃Sn | Optimal baseline |
+| QAOA p=1 | 3.049 | W, Ta, Bi₂Se₃ | Best QAOA depth — still sub-optimal |
+| QAOA p=2 | 3.049 | W, Ta, Bi₂Se₃ | Same selection as p=1 |
+| QAOA p=3 | −0.451 | W, Ta, Pd | Deeper circuit — worse on this oracle |
+| **Greedy (classical)** | **4.259** | **Bi₂Se₃, CrTe₂, Mn₃Sn** | Optimal on surrogate oracle |
+| Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Matches greedy |
 
 ---
 
@@ -100,7 +101,7 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 ## What's next
 
 - **DMRG comparison** — benchmark VQE against density-matrix renormalization group at larger system sizes
-- **Real Materials Project data** — replace mock surrogate training set with live `mp-api` fetches
+- **Expand θ_SH dataset** — add materials or refresh descriptors via `scripts/fetch_mp_theta_sh.py`
 - **2D periodic Kagome tiling** — extend beyond the 1D strip geometry
 - **Paper draft** — LaTeX manuscript targeting Physical Review B or npj Quantum Materials
 

@@ -120,7 +120,7 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 
 **File:** [`04_soc_qaoa.ipynb`](../notebooks/04_soc_qaoa.ipynb)  
 **What it does:**
-- Loads mock θ_SH dataset (12 spintronic materials, offline, no API key needed)
+- Loads θ_SH dataset from `data/mp_theta_sh.csv` (12 spintronic materials; MP descriptors + literature θ_SH)
 - Trains MLP surrogate (`surrogate.train_surrogate`)
 - Scatter plot: actual vs predicted θ_SH
 - Formulates k=3 from N=12 selection as QUBO with constraint penalty λ=6
@@ -139,13 +139,15 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 
 | Method | Total θ_SH | Selected |
 |--------|-----------|----------|
-| QAOA p=1 | 3.080 | W, Ta, Bi₂Se₃ (sub-optimal) |
-| **QAOA p=2** | **4.263** | **Mn₃Sn, CrTe₂, Bi₂Se₃** |
-| QAOA p=3 | 4.263 | Mn₃Sn, CrTe₂, Bi₂Se₃ |
-| Greedy | 4.263 | Bi₂Se₃, CrTe₂, Mn₃Sn |
+| QAOA p=1 | 3.049 | W, Ta, Bi₂Se₃ (sub-optimal) |
+| QAOA p=2 | 3.049 | W, Ta, Bi₂Se₃ |
+| QAOA p=3 | −0.451 | W, Ta, Pd |
+| **Greedy** | **4.259** | **Bi₂Se₃, CrTe₂, Mn₃Sn** |
+| Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ |
 
-QAOA p≥2 recovers the global optimum, matching greedy exactly.
-p=1 (single layer) is insufficient for 12 qubits — as expected for shallow QAOA.
+With MP-grounded structure descriptors (`data/mp_theta_sh.csv`), classical
+baselines beat QAOA on the surrogate oracle. QAOA p=1/2 tie as the best
+quantum run; p=3 does not improve the selection on this 12-material problem.
 
 <table>
 <tr>

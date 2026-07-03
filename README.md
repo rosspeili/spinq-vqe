@@ -65,6 +65,14 @@ conda activate spinq-vqe
 Requires Python ≥ 3.11. Core: `pennylane ≥ 0.39`, `numpy`, `scipy`, `networkx`, `matplotlib`.  
 Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (for SOC QAOA notebooks).
 
+**SOC QAOA data (NB04):** uses committed `data/mp_theta_sh.csv` (no API key needed). To refresh from Materials Project:
+
+```bash
+cp .env.example .env          # add MP_API_KEY from materialsproject.org/api
+pip install -e ".[data]"
+python scripts/fetch_mp_theta_sh.py
+```
+
 ## Notebooks
 
 | # | Notebook | Notes |
@@ -112,10 +120,11 @@ Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (fo
 
 | Method | Total θ_SH | Selected | Notes |
 |--------|-----------|----------|-------|
-| QAOA p=1 | 3.080 | W, Ta, Bi₂Se₃ | Shallow circuit — sub-optimal |
-| **QAOA p=2** | **4.263** | **Mn₃Sn, CrTe₂, Bi₂Se₃** | Matches global optimum |
-| QAOA p=3 | 4.263 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Confirms p=2 result |
-| Greedy (classical) | 4.263 | Bi₂Se₃, CrTe₂, Mn₃Sn | Optimal baseline |
+| QAOA p=1 | 3.049 | W, Ta, Bi₂Se₃ | Best QAOA depth — still sub-optimal |
+| QAOA p=2 | 3.049 | W, Ta, Bi₂Se₃ | Same selection as p=1 |
+| QAOA p=3 | −0.451 | W, Ta, Pd | Deeper circuit — worse on this oracle |
+| **Greedy (classical)** | **4.259** | **Bi₂Se₃, CrTe₂, Mn₃Sn** | Optimal on surrogate oracle |
+| Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Matches greedy |
 
 <img src="figures/qaoa_material_ranking.png" alt="QAOA material ranking" width="560">
 
