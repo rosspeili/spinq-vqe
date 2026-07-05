@@ -79,7 +79,7 @@ python scripts/fetch_mp_theta_sh.py
 | # | Notebook | Notes |
 |---|----------|-------|
 | 01 | [`01_kagome_hamiltonian.ipynb`](notebooks/01_kagome_hamiltonian.ipynb) | lattice, ED baseline, figures |
-| 02 | [`02_vqe_run.ipynb`](notebooks/02_vqe_run.ipynb) | COBYLA 9.66% error, Adam barren plateau confirmed |
+| 02 | [`02_vqe_run.ipynb`](notebooks/02_vqe_run.ipynb) | COBYLA seed stats (mean ± std), 9.66% best error, Adam barren plateau |
 | 03 | [`03_entanglement.ipynb`](notebooks/03_entanglement.ipynb) | entropy profile, MI matrix, sublattice correlations |
 | 04 | [`04_soc_qaoa.ipynb`](notebooks/04_soc_qaoa.ipynb) | surrogate MLP, QAOA p=1/2/3, material ranking |
 | 05 | [`05_scaling_analysis.ipynb`](notebooks/05_scaling_analysis.ipynb) | N=9/12/18 scaling, gradient variance, barren plateau |
@@ -88,13 +88,16 @@ python scripts/fetch_mp_theta_sh.py
 
 ### Ground-state energy (VQE vs exact diagonalisation)
 
-| N | Method | E₀ (normalized) | Error vs ED | Notes |
-|---|--------|-----------------|-------------|-------|
-| 9  | Exact diag. | −1.42190399 | — | Sparse ED, gap Δ ≈ 0 |
-| 9  | **COBYLA / HEA d=3** | **−1.28456** | **9.66%** | 27 params, 801 evals |
-| 9  | Adam / HEA d=3 | +0.141 | — | Barren plateau stall |
-| 12 | COBYLA / HEA d=2 | −1.20351 | 18.70% | 24 params |
-| 18 | Exact diag. | −1.49962859 | — | Spectral gap Δ = 0.037 |
+| N | Seeds | Mean E₀ | Std E₀ | Best E₀ | Error (best) | Notes |
+|---|-------|---------|--------|---------|--------------|-------|
+| 9 | 5 | −1.23572 | 0.02852 | **−1.28456** | **9.66%** | HEA d=3, 27 params |
+| 12 | 3 | −1.21520 | 0.02026 | −1.23859 | 16.33% | HEA d=2, 24 params |
+| 9 | — | — | — | −1.42190399 | — | Exact diag., gap Δ ≈ 0 |
+| 18 | — | — | — | −1.49962859 | — | Exact diag., gap Δ = 0.037 |
+
+Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). COBYLA mean ± std and per-seed
+distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
+`figures/vqe_seed_distribution.png` (regenerate via NB02).
 
 **Why COBYLA, not Adam:** The `|0⟩⊗N` initial state is a Z-basis eigenstate — all IsingXX/YY/ZZ gradients cancel to exactly zero by SU(2) symmetry. COBYLA uses function evaluations directly and is immune to this.
 

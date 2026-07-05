@@ -13,7 +13,14 @@ import numpy as np
 import pytest
 
 from spinq_vqe.ansatz import hea_ansatz, hva_ansatz, init_params
-from spinq_vqe.vqe import VQEResult, run_vqe, run_vqe_cobyla
+from spinq_vqe.vqe import (
+    VQEMultiSeedResult,
+    VQEResult,
+    run_vqe,
+    run_vqe_cobyla,
+    run_vqe_cobyla_multi_seed,
+    seed_statistics,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -173,3 +180,85 @@ class TestRunVQEAdam:
             depth=1, edges=edges1,
         )
         assert result.optimizer == "adam"
+
+
+# ---------------------------------------------------------------------------
+# Seed statistics and multi-seed COBYLA
+# ---------------------------------------------------------------------------
+
+
+class TestSeedStatistics:
+    def test_single_seed(self):
+        stats = seed_statistics([-1.0])
+        assert stats.n_seeds == 1
+        assert stats.mean_energy == -1.0
+        assert stats.std_energy == 0.0
+        assert stats.min_energy == -1.0
+        assert stats.max_energy == -1.0
+
+    def test_multiple_seeds(self):
+        stats = seed_statistics([-1.2, -1.0, -1.4])
+        assert stats.n_seeds == 3
+        assert abs(stats.mean_energy - (-1.2)) < 1e-12
+        assert stats.min_energy == -1.4
+        assert stats.max_energy == -1.0
+        assert stats.std_energy > 0.0
+
+    def test_empty_raises(self):
+        with pytest.raises(ValueError, match="at least one"):
+            seed_statistics([])
+
+
+class TestRunVQECobylaMultiSeed:
+    def test_returns_multi_seed_result(self, H1_bare, edges1):
+        seeds = [0, 1, 2]
+
+        def init_fn(seed: int) -> np.ndarray:
+            return init_params("hea", n_sites=3, depth=1, seed=seed)
+
+        result = run_vqe_cobyla_multi_seed(
+            hamiltonian=H1_bare,
+            ansatz_fn=hea_ansatz,
+            init_params_fn=init_fn,
+            n_sites=3,
+            seeds=seeds,
+            n_evals=25,
+            verbose=False,
+            depth=1,
+            edges=edges1,
+        )
+        assert isinstance(result, VQEMultiSeedResult)
+        assert len(result.runs) == 3
+        assert result.seeds == seeds
+        assert result.statistics.n_seeds == 3
+        assert result.best.energy == min(r.energy for r in result.runs)
+
+    def test_best_has_statevector_when_requested(self, H1_bare, edges1):
+        result = run_vqe_cobyla_multi_seed(
+            hamiltonian=H1_bare,
+            ansatz_fn=hea_ansatz,
+            init_params_fn=lambda s: init_params("hea", 3, depth=1, seed=s),
+            n_sites=3,
+            seeds=[4, 5],
+            n_evals=20,
+            return_statevector=True,
+            verbose=False,
+            depth=1,
+            edges=edges1,
+        )
+        assert result.best.statevector is not None
+        assert result.best.statevector.shape == (8,)
+        assert all(r.statevector is None for r in result.runs)
+
+    def test_empty_seeds_raises(self, H1_bare, edges1):
+        with pytest.raises(ValueError, match="at least one"):
+            run_vqe_cobyla_multi_seed(
+                H1_bare,
+                hea_ansatz,
+                lambda s: init_params("hea", 3, depth=1, seed=s),
+                3,
+                seeds=[],
+                verbose=False,
+                depth=1,
+                edges=edges1,
+            )
