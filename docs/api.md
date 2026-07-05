@@ -58,6 +58,30 @@ Two VQE runners. **Use `run_vqe_cobyla` for actual optimization** on this system
 from spinq_vqe import vqe
 ```
 
+### `run_vqe_cobyla_multi_seed` ← multi-seed statistics
+
+Runs COBYLA over a list of integer seeds (via ``init_params_fn``), returns the best
+``VQEResult`` plus ``SeedStatistics`` (mean, std, min, max).
+
+```python
+def init_fn(seed: int) -> np.ndarray:
+    return ansatz.init_params('hea', n_sites=9, depth=3, seed=seed, scale=1.0)
+
+multi = vqe.run_vqe_cobyla_multi_seed(
+    hamiltonian, ansatz.hea_ansatz, init_fn, n_sites=9,
+    seeds=[42, 7, 123, 99, 17],
+    n_evals=5000, depth=3, edges=edges,
+)
+print(multi.statistics.mean_energy, multi.statistics.std_energy)
+best = multi.best  # lowest energy; statevector attached if return_statevector=True
+```
+
+### `seed_statistics`
+
+```python
+stats = vqe.seed_statistics([r.energy for r in multi.runs])
+```
+
 ### `run_vqe_cobyla` ← primary
 
 COBYLA gradient-free optimizer. Immune to the zero-gradient problem at Z-basis eigenstates.
@@ -103,6 +127,16 @@ result = vqe.run_vqe(
 | `converged` | `bool` | Whether optimizer reported convergence |
 | `statevector` | `np.ndarray \| None` | Final `\|ψ⟩`, shape `(2^N,)` |
 | `optimizer` | `str` | `'cobyla'` or `'adam'` |
+
+### `SeedStatistics` / `VQEMultiSeedResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mean_energy`, `std_energy`, `min_energy`, `max_energy` | `float` | Aggregate over seeds |
+| `n_seeds` | `int` | Number of runs |
+| `best` | `VQEResult` | Lowest-energy run (statevector on best only) |
+| `runs` | `list[VQEResult]` | Per-seed results |
+| `seeds` | `list[int]` | Seeds used |
 
 ---
 

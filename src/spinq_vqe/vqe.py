@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import importlib.util
 from dataclasses import dataclass, field
-from typing import Callable
+from collections.abc import Callable, Sequence
 
 import numpy as np
 import pennylane as qp
@@ -76,6 +76,54 @@ class VQEResult:
 
     n_sites: int = 0
     n_params: int = 0
+
+
+@dataclass
+class SeedStatistics:
+    """Aggregate statistics over multiple random VQE initializations."""
+
+    mean_energy: float
+    std_energy: float
+    min_energy: float
+    max_energy: float
+    n_seeds: int
+
+
+@dataclass
+class VQEMultiSeedResult:
+    """Best COBYLA run plus seed-level statistics and per-seed histories."""
+
+    best: VQEResult
+    statistics: SeedStatistics
+    runs: list[VQEResult]
+    seeds: list[int]
+
+
+def seed_statistics(energies: Sequence[float]) -> SeedStatistics:
+    """
+    Compute mean, sample std, min, and max over final energies from multiple seeds.
+
+    Parameters
+    ----------
+    energies : sequence of float
+        Final best energies, one per random initialization.
+
+    Returns
+    -------
+    SeedStatistics
+    """
+    arr = np.asarray(energies, dtype=float)
+    if arr.size == 0:
+        raise ValueError("seed_statistics requires at least one energy value.")
+    n = int(arr.size)
+    std = float(np.std(arr, ddof=1)) if n > 1 else 0.0
+    return SeedStatistics(
+        mean_energy=float(np.mean(arr)),
+        std_energy=std,
+        min_energy=float(np.min(arr)),
+        max_energy=float(np.max(arr)),
+        n_seeds=n,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -196,6 +244,88 @@ def run_vqe_cobyla(
         optimizer="cobyla",
         n_sites=n_sites,
         n_params=len(init_params),
+    )
+
+
+def run_vqe_cobyla_multi_seed(
+    hamiltonian: qp.Hamiltonian,
+    ansatz_fn: Callable,
+    init_params_fn: Callable[[int], np.ndarray],
+    n_sites: int,
+    seeds: Sequence[int],
+    ansatz_name: str = "hea",
+    n_evals: int = 5000,
+    rhobeg: float = 0.5,
+    return_statevector: bool = True,
+    verbose: bool = True,
+    **ansatz_kwargs,
+) -> VQEMultiSeedResult:
+    """
+    Run COBYLA VQE over multiple random seeds; keep the best run and seed statistics.
+
+    Parameters
+    ----------
+    hamiltonian : qp.Hamiltonian
+    ansatz_fn : callable
+    init_params_fn : callable
+        ``init_params_fn(seed) -> np.ndarray`` for each integer seed.
+    n_sites : int
+    seeds : sequence of int
+        Random seeds passed to ``init_params_fn``.
+    ansatz_name, n_evals, rhobeg, return_statevector, verbose
+        Forwarded to ``run_vqe_cobyla`` (statevector computed for the best run only).
+    **ansatz_kwargs
+        Passed through to ``ansatz_fn``.
+
+    Returns
+    -------
+    VQEMultiSeedResult
+    """
+    seed_list = [int(s) for s in seeds]
+    if not seed_list:
+        raise ValueError("seeds must contain at least one integer.")
+
+    runs: list[VQEResult] = []
+    for i, seed in enumerate(seed_list):
+        p0 = init_params_fn(seed)
+        result = run_vqe_cobyla(
+            hamiltonian=hamiltonian,
+            ansatz_fn=ansatz_fn,
+            init_params=p0,
+            n_sites=n_sites,
+            ansatz_name=ansatz_name,
+            n_evals=n_evals,
+            rhobeg=rhobeg,
+            return_statevector=False,
+            verbose=verbose,
+            **ansatz_kwargs,
+        )
+        runs.append(result)
+
+    best = min(runs, key=lambda r: r.energy)
+    if return_statevector:
+        best = VQEResult(
+            energy=best.energy,
+            params=best.params,
+            energy_history=best.energy_history,
+            gradient_variance_history=best.gradient_variance_history,
+            n_steps=best.n_steps,
+            converged=best.converged,
+            statevector=_get_statevector(
+                ansatz_fn, best.params, n_sites, **ansatz_kwargs
+            ),
+            ansatz=best.ansatz,
+            optimizer=best.optimizer,
+            n_sites=best.n_sites,
+            n_params=best.n_params,
+        )
+
+    stats = seed_statistics([r.energy for r in runs])
+    return VQEMultiSeedResult(
+        best=best,
+        statistics=stats,
+        runs=runs,
+        seeds=seed_list,
     )
 
 

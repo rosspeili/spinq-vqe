@@ -8,6 +8,21 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+### Added
+
+- `seed_statistics`, `run_vqe_cobyla_multi_seed`, `SeedStatistics`, and
+  `VQEMultiSeedResult` in `vqe.py` for seed-level VQE reporting (#6).
+- NB02: mean ± std table, per-seed CSV (`data/vqe_seeds_n9.csv`), box plot
+  (`figures/vqe_seed_distribution.png`).
+- NB05: multi-seed N=12 via `run_vqe_cobyla_multi_seed`, cross-size box plot
+  (`figures/vqe_seed_scaling_boxplot.png`).
+
+### Changed
+
+- `data/vqe_results.csv` and `data/vqe_scaling.csv` schemas extended with
+  `mean_energy`, `std_energy`, `n_seeds`, `min_energy`, `max_energy` (#6).
+- README, OVERVIEW, and docs updated to report best seed and mean ± std.
+
 ## [0.1.2] - 2026-07-03
 
 ### Changed

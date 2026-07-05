@@ -1,4 +1,4 @@
-Method,Ansatz,Params,Best E,Err %,Evals
-COBYLA,HEA d=3,27,-1.2845631,9.659,801
-Adam,HEA d=3,27,0.14131268,109.938,1000
-ED (exact),--,--,-1.42190399,0.0,--
+Method,Ansatz,Params,Best E,Err %,Evals,mean_energy,std_energy,n_seeds,min_energy,max_energy
+COBYLA,HEA d=3,27,-1.2845631,9.659,801,-1.23571993,0.02853436,5,-1.2845631,-1.21642925
+Adam,HEA d=3,27,0.14131268,109.938,1000,0.1910431,0.07032944,2,0.14131268,0.24077353
+ED (exact),--,--,-1.42190399,0.0,--,,,,,

@@ -42,13 +42,15 @@ The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficie
 
 ### Ground-state energy (VQE vs exact diagonalization)
 
-| N | Method | E₀ (normalized) | Error vs ED | Notes |
-|---|--------|-----------------|-------------|-------|
-| 9  | Exact diag. | −1.42190399 | — | Sparse ED, gap Δ ≈ 0 |
-| 9  | **COBYLA / HEA d=3** | **−1.28456** | **9.66%** | 27 params, 801 evals |
-| 9  | Adam / HEA d=3 | +0.141 | — | Barren plateau stall |
-| 12 | COBYLA / HEA d=2 | −1.20351 | 18.70% | 24 params |
-| 18 | Exact diag. | −1.49962859 | — | Spectral gap Δ = 0.037 |
+| N | Seeds | Mean E₀ | Std E₀ | Best E₀ | Error (best) | Notes |
+|---|-------|---------|--------|---------|--------------|-------|
+| 9 | 5 | −1.23572 | 0.02853 | **−1.28456** | **9.66%** | HEA d=3, 27 params |
+| 12 | 3 | −1.21520 | 0.02026 | −1.23859 | 16.33% | HEA d=2, 24 params |
+| 9 | — | — | — | −1.42190399 | — | Exact diag., gap Δ ≈ 0 |
+| 18 | — | — | — | −1.49962859 | — | Exact diag., gap Δ = 0.037 |
+
+Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). Seed-level statistics live in
+`data/vqe_results.csv` and `figures/vqe_seed_distribution.png`.
 
 ### Entanglement structure (N = 9 statevector)
 
