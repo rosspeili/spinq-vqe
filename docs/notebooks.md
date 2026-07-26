@@ -50,9 +50,10 @@ All notebooks live in `notebooks/`. Run them in order — later notebooks depend
 
 **File:** [`02_vqe_run.ipynb`](../notebooks/02_vqe_run.ipynb)  
 **What it does:**
-- **COBYLA** (primary): 5 seeds × 5000 evaluations, HEA depth=3, random init `scale=1.0`
+- **COBYLA** (primary): 5 seeds × 5000 evaluations via `run_vqe_cobyla_multi_seed`, HEA depth=3
 - **Adam** (diagnostic): 2 seeds × 1000 steps — demonstrates the zero-gradient failure
-- Plots COBYLA convergence curves + Adam gradient variance (barren plateau evidence)
+- Statistical summary: mean ± std, min/max across seeds; per-seed CSV
+- Fan plot of all seed convergence curves + box plot of final energies vs ED
 - Saves best statevector to `data/statevector_hea_best.npy` for NB03
 
 **Why COBYLA, not Adam:** `|0⟩⊗N` is a Z-basis eigenstate. All IsingXX/YY/ZZ gradients cancel
@@ -62,18 +63,25 @@ directly without needing gradients.
 **Key outputs:**
 - `figures/vqe_convergence.png`
 - `figures/vqe_bar.png`
-- `data/vqe_results.csv`
+- `figures/vqe_seed_distribution.png`
+- `data/vqe_results.csv` (includes `mean_energy`, `std_energy`, `n_seeds`, `min_energy`, `max_energy`)
+- `data/vqe_seeds_n9.csv`
 - `data/statevector_hea_best.npy`
 
 **Results:**
 
-| Method | E₀ | Error vs ED | Evals |
-|--------|----|-------------|-------|
+| N | Seeds | Mean E₀ | Std E₀ | Best E₀ | Error (best) |
+|---|-------|---------|--------|---------|--------------|
+| 9 | 5 | −1.23572 | 0.02853 | −1.28456 | **9.66%** |
+
+| Method | E₀ (best) | Error vs ED | Evals |
+|--------|-----------|-------------|-------|
 | COBYLA / HEA depth=3 | −1.28456 | **9.66%** | 801 |
 | Adam / HEA depth=3 | +0.141 | stalled | 1000 |
 | ED exact | −1.42190399 | — | — |
 
 <img src="../figures/vqe_bar.png" alt="VQE vs ED bar chart" width="420">
+<img src="../figures/vqe_seed_distribution.png" alt="COBYLA seed distribution N=9" width="420">
 
 ---
 
@@ -181,17 +189,26 @@ quantum run; p=3 does not improve the selection on this 12-material problem.
 **File:** [`05_scaling_analysis.ipynb`](../notebooks/05_scaling_analysis.ipynb)  
 **What it does:**
 - Sparse ED for N=12 inline (4096-dim Hilbert space, ~seconds)
-- Loads N=9 COBYLA result from NB02 CSV (no rerun)
-- Runs COBYLA VQE at N=12 (HEA depth=2, 24 params, 3 seeds × 2000 evals)
+- Loads N=9 COBYLA statistics from NB02 CSV (`mean_energy`, `vqe_seeds_n9.csv`)
+- Runs COBYLA VQE at N=12 via `run_vqe_cobyla_multi_seed` (HEA depth=2, 3 seeds × 2000 evals)
 - VQE energy error vs N (9, 12) + ED reference at N=18
+- Box plot comparing seed energy distributions at N=9 vs N=12
 - Adam gradient variance at N=9 and N=12 (10 seeds × 30 steps)
 - Box plot + log-scale plot of barren plateau scaling
-- Saves `data/vqe_scaling.csv`
+- Saves `data/vqe_scaling.csv` (includes seed statistics columns)
 
 **Key outputs:**
 - `figures/scaling_energy.png`
 - `figures/scaling_gradient_variance.png`
+- `figures/vqe_seed_scaling_boxplot.png`
 - `data/vqe_scaling.csv`
+
+**Results (COBYLA, after notebook rerun):**
+
+| N | Seeds | Best E₀ | Error (best) | Notes |
+|---|-------|---------|--------------|-------|
+| 9 | 5 | −1.28456 | 9.66% | from NB02 CSV |
+| 12 | 3 | −1.23859 | 16.33% | `run_vqe_cobyla_multi_seed`, seeds [42, 7, 123] |
 
 <table>
 <tr>
