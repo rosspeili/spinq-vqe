@@ -133,6 +133,7 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 - Scatter plot: actual vs predicted θ_SH
 - Formulates k=3 from N=12 selection as QUBO with constraint penalty λ=6
 - Runs QAOA at depth p=1, 2, 3 (COBYLA, 5 seeds × 300 evals per depth)
+- **p=1 (γ, β) cost landscape** heatmap with COBYLA path and depth-sensitivity panel
 - Classical baselines: greedy top-k and simulated annealing
 - Bar comparison and material ranking visualisation
 
@@ -140,6 +141,7 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 - `figures/surrogate_predictions.png`
 - `figures/qaoa_comparison.png`
 - `figures/qaoa_convergence.png`
+- `figures/qaoa_landscape.png`
 - `figures/qaoa_material_ranking.png`
 - `data/qaoa_results.csv`
 
@@ -179,6 +181,9 @@ quantum run; p=3 does not improve the selection on this 12-material problem.
 <tr>
 <td><img src="../figures/qaoa_material_ranking.png" alt="QAOA material ranking" width="100%"></td>
 <td><img src="../figures/qaoa_comparison.png" alt="QAOA vs baselines" width="100%"></td>
+</tr>
+<tr>
+<td colspan="2"><img src="../figures/qaoa_landscape.png" alt="QAOA p=1 landscape" width="100%"></td>
 </tr>
 </table>
 

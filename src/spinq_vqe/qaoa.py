@@ -32,9 +32,10 @@ Pipeline
 1. ``build_cost_hamiltonian(theta_sh, k, lam)``  — build H_C from θ_SH values
 2. ``build_mixer_hamiltonian(n_materials)``       — build H_M
 3. ``run_qaoa(theta_sh, k, p, ...)``              — full QAOA optimization
-4. ``sample_bitstrings(result, n_shots)``          — sample from optimized circuit
-5. ``classical_greedy(theta_sh, k)``              — greedy baseline comparison → ``list[int]``
-6. ``classical_simulated_annealing(theta_sh, k)`` — SA baseline comparison
+4. ``qaoa_landscape_grid(...)``                     — (γ, β) cost landscape at p=1
+5. ``sample_bitstrings(result, n_shots)``          — sample from optimized circuit
+6. ``classical_greedy(theta_sh, k)``              — greedy baseline comparison → ``list[int]``
+7. ``classical_simulated_annealing(theta_sh, k)`` — SA baseline comparison
 
 References
 ----------
@@ -46,13 +47,11 @@ References
 
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass, field
 
 import numpy as np
 import pennylane as qp
 from scipy.optimize import minimize
-
 
 # ---------------------------------------------------------------------------
 # Result containers
@@ -86,6 +85,27 @@ class QAOAResult:
 
     n_materials: int = 0
     k: int = 0
+
+    param_history: list[np.ndarray] = field(default_factory=list)
+    """(γ, β, …) at each COBYLA evaluation for the best seed (if recorded)."""
+
+
+@dataclass
+class QAOALandscapeGrid:
+    """Cost landscape samples for QAOA at fixed depth ``p`` (typically p=1)."""
+
+    gamma: np.ndarray
+    """γ grid, shape ``(n_gamma,)``."""
+
+    beta: np.ndarray
+    """β grid, shape ``(n_beta,)``."""
+
+    energies: np.ndarray
+    """Cost values, shape ``(n_gamma, n_beta)``."""
+
+    p: int = 1
+    k: int = 0
+    lam: float = 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -211,6 +231,170 @@ def qaoa_circuit(
 
 
 # ---------------------------------------------------------------------------
+# Cost evaluation and landscape sampling
+# ---------------------------------------------------------------------------
+
+
+def make_qaoa_cost_fn(
+    theta_sh: np.ndarray,
+    k: int,
+    p: int = 1,
+    lam: float = 5.0,
+):
+    """
+    Build a PennyLane QAOA cost evaluator ⟨H_C⟩ for fixed depth ``p``.
+
+    Parameters
+    ----------
+    theta_sh : np.ndarray
+        Oracle θ_SH values (length N).
+    k : int
+        Selection size.
+    p : int
+        QAOA depth.
+    lam : float
+        Constraint penalty.
+
+    Returns
+    -------
+    evaluate : callable
+        ``evaluate(params) -> float`` where ``params`` has shape ``(2*p,)``.
+    cost_h, mixer_h : qp.Hamiltonian
+        Hamiltonians used by the circuit.
+    n_materials : int
+    """
+    N = len(theta_sh)
+    if k >= N:
+        raise ValueError(f"k={k} must be < N={N}.")
+    if p < 1:
+        raise ValueError("p must be >= 1")
+
+    cost_h = build_cost_hamiltonian(theta_sh, k, lam)
+    mixer_h = build_mixer_hamiltonian(N)
+    device = qp.device("default.qubit", wires=N)
+
+    @qp.qnode(device)
+    def cost_fn(params):
+        qaoa_circuit(params, cost_h, mixer_h, N, p)
+        return qp.expval(cost_h)
+
+    def evaluate(params: np.ndarray) -> float:
+        return float(cost_fn(np.asarray(params, dtype=float)))
+
+    return evaluate, cost_h, mixer_h, N
+
+
+def evaluate_qaoa_cost(
+    theta_sh: np.ndarray,
+    params: np.ndarray,
+    k: int,
+    p: int = 1,
+    lam: float = 5.0,
+) -> float:
+    """Evaluate the QAOA cost at a single parameter vector."""
+    evaluate, _, _, _ = make_qaoa_cost_fn(theta_sh, k, p=p, lam=lam)
+    return evaluate(params)
+
+
+def qaoa_landscape_grid(
+    theta_sh: np.ndarray,
+    k: int,
+    lam: float = 5.0,
+    p: int = 1,
+    n_gamma: int = 40,
+    n_beta: int = 40,
+    gamma_bounds: tuple[float, float] = (0.0, 2 * np.pi),
+    beta_bounds: tuple[float, float] = (0.0, np.pi),
+) -> QAOALandscapeGrid:
+    """
+    Sample the QAOA cost over a (γ, β) grid at fixed depth ``p``.
+
+    For ``p > 1`` only the first layer angles are swept; remaining layers are
+    held at zero (use ``p=1`` for the standard landscape diagnostic).
+
+    Parameters
+    ----------
+    theta_sh, k, lam, p
+        Problem definition (same as ``run_qaoa``).
+    n_gamma, n_beta : int
+        Grid resolution.
+    gamma_bounds, beta_bounds : tuple of float
+        Angle ranges in radians.
+
+    Returns
+    -------
+    QAOALandscapeGrid
+    """
+    if p != 1:
+        raise ValueError("qaoa_landscape_grid currently supports p=1 only.")
+
+    evaluate, _, _, _ = make_qaoa_cost_fn(theta_sh, k, p=p, lam=lam)
+    gammas = np.linspace(gamma_bounds[0], gamma_bounds[1], n_gamma)
+    betas = np.linspace(beta_bounds[0], beta_bounds[1], n_beta)
+    energies = np.zeros((n_gamma, n_beta), dtype=float)
+
+    for i, gamma in enumerate(gammas):
+        for j, beta in enumerate(betas):
+            energies[i, j] = evaluate(np.array([gamma, beta], dtype=float))
+
+    return QAOALandscapeGrid(
+        gamma=gammas,
+        beta=betas,
+        energies=energies,
+        p=p,
+        k=k,
+        lam=lam,
+    )
+
+
+def find_landscape_minima(
+    landscape: QAOALandscapeGrid,
+    *,
+    neighborhood: int = 3,
+    max_minima: int = 5,
+) -> list[tuple[float, float, float]]:
+    """
+    Find coarse local minima on a sampled QAOA landscape.
+
+    Returns
+    -------
+    list of (gamma, beta, energy), sorted by increasing energy.
+    """
+    from scipy.ndimage import minimum_filter
+
+    if neighborhood < 3:
+        raise ValueError("neighborhood must be >= 3")
+    if neighborhood % 2 == 0:
+        neighborhood += 1
+
+    filtered = minimum_filter(landscape.energies, size=neighborhood, mode="wrap")
+    mask = np.isclose(landscape.energies, filtered, rtol=0.0, atol=1e-8)
+    coords = np.argwhere(mask)
+
+    minima: list[tuple[float, float, float]] = []
+    for i, j in coords:
+        minima.append(
+            (
+                float(landscape.gamma[i]),
+                float(landscape.beta[j]),
+                float(landscape.energies[i, j]),
+            )
+        )
+
+    minima.sort(key=lambda item: item[2])
+    deduped: list[tuple[float, float, float]] = []
+    for gamma, beta, energy in minima:
+        if all(
+            np.hypot(gamma - g, beta - b) > 0.35
+            for g, b, _ in deduped
+        ):
+            deduped.append((gamma, beta, energy))
+        if len(deduped) >= max_minima:
+            break
+    return deduped
+
+
+# ---------------------------------------------------------------------------
 # QAOA optimizer
 # ---------------------------------------------------------------------------
 
@@ -224,6 +408,7 @@ def run_qaoa(
     n_seeds: int = 5,
     step_size: float = 0.1,
     verbose: bool = True,
+    record_param_history: bool = False,
 ) -> QAOAResult:
     """
     Run QAOA optimization for the k-from-N material selection problem.
@@ -246,6 +431,9 @@ def run_qaoa(
     step_size : float
         Initial step size for COBYLA (rhobeg).
     verbose : bool
+    record_param_history : bool
+        If True, store parameter vectors at each evaluation for the best seed
+        (useful for landscape trajectory overlays).
 
     Returns
     -------
@@ -267,6 +455,7 @@ def run_qaoa(
     best_energy = np.inf
     best_params = None
     best_history: list[float] = []
+    best_param_history: list[np.ndarray] = []
 
     rng = np.random.default_rng(42)
     for seed_idx in range(n_seeds):
@@ -276,10 +465,14 @@ def run_qaoa(
         p0 = np.concatenate([p0_gamma, p0_beta])
 
         history: list[float] = []
+        param_history: list[np.ndarray] = []
 
         def objective(params):
+            params = np.asarray(params, dtype=float)
             e = float(cost_fn(params))
             history.append(e)
+            if record_param_history:
+                param_history.append(params.copy())
             return e
 
         result = minimize(
@@ -293,6 +486,7 @@ def run_qaoa(
             best_energy = result.fun
             best_params = result.x
             best_history = history
+            best_param_history = param_history
 
         if verbose:
             print(f"  seed={seed_idx}  E={result.fun:.6f}  evals={len(history)}")
@@ -317,6 +511,7 @@ def run_qaoa(
         p=p,
         n_materials=N,
         k=k,
+        param_history=best_param_history,
     )
 
 

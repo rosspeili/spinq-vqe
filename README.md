@@ -81,7 +81,7 @@ python scripts/fetch_mp_theta_sh.py
 | 01 | [`01_kagome_hamiltonian.ipynb`](notebooks/01_kagome_hamiltonian.ipynb) | lattice, ED baseline, figures |
 | 02 | [`02_vqe_run.ipynb`](notebooks/02_vqe_run.ipynb) | COBYLA seed stats (mean ± std), 9.66% best error, Adam barren plateau |
 | 03 | [`03_entanglement.ipynb`](notebooks/03_entanglement.ipynb) | entropy profile, MI matrix, sublattice correlations |
-| 04 | [`04_soc_qaoa.ipynb`](notebooks/04_soc_qaoa.ipynb) | surrogate MLP, QAOA p=1/2/3, material ranking |
+| 04 | [`04_soc_qaoa.ipynb`](notebooks/04_soc_qaoa.ipynb) | surrogate MLP, QAOA p=1/2/3, landscape diagnostic |
 | 05 | [`05_scaling_analysis.ipynb`](notebooks/05_scaling_analysis.ipynb) | N=9/12/18 scaling, gradient variance, barren plateau |
 
 ## Key results
@@ -131,6 +131,8 @@ distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
 | Sim. annealing | 4.259 | Mn₃Sn, CrTe₂, Bi₂Se₃ | Matches greedy |
 
 <img src="figures/qaoa_material_ranking.png" alt="QAOA material ranking" width="560">
+
+<img src="figures/qaoa_landscape.png" alt="QAOA p=1 landscape and depth sensitivity" width="720">
 
 ## Tests
 

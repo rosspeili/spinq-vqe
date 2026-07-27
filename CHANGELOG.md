@@ -13,7 +13,12 @@ and this project uses semantic versioning through the package version in
 - Clarified the NB04 data boundary in `OVERVIEW.md`: Materials Project provides
   structure metadata, θ_SH targets remain curated literature labels, and the
   notebook demonstrates the method rather than claiming material discovery.
+
 ### Added
+
+- QAOA p=1 landscape utilities (`qaoa_landscape_grid`, `find_landscape_minima`,
+  `record_param_history` on `run_qaoa`) and `figures/qaoa_landscape.png` (#7).
+- NB04: landscape heatmap + depth-sensitivity panel; `scripts/generate_qaoa_landscape.py`.
 
 - `seed_statistics`, `run_vqe_cobyla_multi_seed`, `SeedStatistics`, and
   `VQEMultiSeedResult` in `vqe.py` for seed-level VQE reporting (#6).

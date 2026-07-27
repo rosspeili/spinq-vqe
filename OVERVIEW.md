@@ -36,7 +36,7 @@ The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficie
 
 Materials Project supplies the structure metadata, while the θ_SH targets remain curated literature labels. NB04 is a reproducibility and method-demonstration workflow on the committed 12-material surrogate oracle rather than a new material-discovery claim.
 
-**Decisions made in this release:** classical surrogate oracle (not raw DFT per evaluation); QAOA depths p = 1, 2, 3 compared against greedy and simulated-annealing baselines; k = 3 selected from N = 12 materials.
+**Decisions made in this release:** classical surrogate oracle (not raw DFT per evaluation); QAOA depths p = 1, 2, 3 compared against greedy and simulated-annealing baselines; k = 3 selected from N = 12 materials; p=1 (γ, β) landscape and depth-sensitivity plot (`figures/qaoa_landscape.png`) show that shallow QAOA can stall in a suboptimal basin while classical baselines reach the global optimum.
 
 ---
 

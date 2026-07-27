@@ -348,3 +348,125 @@ def plot_gradient_variance(
     if save_path:
         fig.savefig(save_path, bbox_inches="tight", dpi=150)
     return fig
+
+
+# ---------------------------------------------------------------------------
+# QAOA landscape (NB04 diagnostic)
+# ---------------------------------------------------------------------------
+
+
+def plot_qaoa_landscape(
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    energies: np.ndarray,
+    *,
+    cobyla_gamma: float | None = None,
+    cobyla_beta: float | None = None,
+    param_trajectory: list[np.ndarray] | None = None,
+    local_minima: list[tuple[float, float, float]] | None = None,
+    depth_energies: dict[int, float] | None = None,
+    figsize: tuple[float, float] = (12.0, 4.8),
+    save_path: str | None = None,
+) -> plt.Figure:
+    """
+    Two-panel QAOA diagnostic: p=1 (γ, β) cost landscape + depth sensitivity.
+
+    Parameters
+    ----------
+    gamma, beta : np.ndarray
+        1-D angle grids.
+    energies : np.ndarray, shape (len(gamma), len(beta))
+        Sampled QAOA cost values.
+    cobyla_gamma, cobyla_beta : float, optional
+        Best COBYLA optimum to mark on the landscape.
+    param_trajectory : list of ndarray, optional
+        COBYLA parameter vectors (p=1: each shape ``(2,)``).
+    local_minima : list of (γ, β, E), optional
+        Coarse local minima from ``find_landscape_minima``.
+    depth_energies : dict[int, float], optional
+        Best QAOA cost vs circuit depth ``p``.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=figsize)
+
+    ax = axes[0]
+    gg, bb = np.meshgrid(beta, gamma)
+    cf = ax.contourf(gg, bb, energies, levels=30, cmap="viridis", alpha=0.92)
+    ax.contour(gg, bb, energies, levels=12, colors="white", linewidths=0.4, alpha=0.5)
+    cbar = fig.colorbar(cf, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label("QAOA cost ⟨H_C⟩", color="#555555", fontsize=10)
+
+    if local_minima:
+        mins = np.array(local_minima)
+        ax.scatter(
+            mins[:, 1],
+            mins[:, 0],
+            s=55,
+            facecolors="none",
+            edgecolors="#F5C9A0",
+            linewidths=1.4,
+            label="local minima",
+            zorder=4,
+        )
+
+    if param_trajectory:
+        traj = np.asarray(param_trajectory)
+        if traj.ndim == 2 and traj.shape[1] >= 2:
+            ax.plot(
+                traj[:, 1],
+                traj[:, 0],
+                color="#FFFFFF",
+                lw=1.2,
+                alpha=0.75,
+                label="COBYLA path",
+                zorder=5,
+            )
+
+    if cobyla_gamma is not None and cobyla_beta is not None:
+        ax.scatter(
+            [cobyla_beta],
+            [cobyla_gamma],
+            s=90,
+            color="#E8A598",
+            edgecolors="white",
+            linewidths=1.0,
+            zorder=6,
+            label="COBYLA best",
+        )
+
+    ax.set_xlabel("β", color="#555555")
+    ax.set_ylabel("γ", color="#555555")
+    ax.set_title(
+        "QAOA p=1 cost landscape",
+        fontsize=12,
+        fontweight="semibold",
+        color="#333333",
+    )
+    ax.legend(fontsize=8, framealpha=0.9, loc="upper right")
+
+    ax2 = axes[1]
+    if depth_energies:
+        depths = sorted(depth_energies)
+        costs = [depth_energies[p] for p in depths]
+        bars = ax2.bar(
+            [str(p) for p in depths],
+            costs,
+            color=ANSATZ_COLORS["hea"],
+            alpha=0.85,
+            edgecolor="white",
+        )
+        ax2.bar_label(bars, fmt="%.2f", fontsize=9, color="#444444")
+        ax2.set_xlabel("QAOA depth p")
+        ax2.set_ylabel("Best cost ⟨H_C⟩")
+        ax2.set_title(
+            "Cost vs circuit depth",
+            fontsize=12,
+            fontweight="semibold",
+            color="#333333",
+        )
+    else:
+        ax2.axis("off")
+
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path, bbox_inches="tight", dpi=150)
+    return fig
