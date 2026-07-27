@@ -8,6 +8,22 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-07-27
+
+### Added
+
+- QAOA p=1 landscape utilities (`qaoa_landscape_grid`, `find_landscape_minima`,
+  `record_param_history` on `run_qaoa`) and `figures/qaoa_landscape.png` (#7, #28).
+- NB04: landscape heatmap + θ_SH-vs-depth panel; `scripts/generate_qaoa_landscape.py`.
+- `seed_statistics`, `run_vqe_cobyla_multi_seed`, `SeedStatistics`, and
+  `VQEMultiSeedResult` in `vqe.py` for seed-level VQE reporting (#6).
+- NB02: mean ± std table, per-seed CSV (`data/vqe_seeds_n9.csv`), box plot
+  (`figures/vqe_seed_distribution.png`).
+- NB05: multi-seed N=12 via `run_vqe_cobyla_multi_seed`, cross-size box plot
+  (`figures/vqe_seed_scaling_boxplot.png`).
+- Zenodo DOI badge placeholder in `README.md` (concept DOI to be filled after
+  first deposit).
+
 ### Changed
 
 - Clarified the NB04 data boundary in `OVERVIEW.md`: Materials Project provides
@@ -18,18 +34,8 @@ and this project uses semantic versioning through the package version in
 - `data/vqe_results.csv` and `data/vqe_scaling.csv` schemas extended with
   `mean_energy`, `std_energy`, `n_seeds`, `min_energy`, `max_energy` (#6).
 - README, OVERVIEW, and docs updated to report best seed and mean ± std.
-
-### Added
-
-- QAOA p=1 landscape utilities (`qaoa_landscape_grid`, `find_landscape_minima`,
-  `record_param_history` on `run_qaoa`) and `figures/qaoa_landscape.png` (#7).
-- NB04: landscape heatmap + θ_SH-vs-depth panel; `scripts/generate_qaoa_landscape.py`.
-- `seed_statistics`, `run_vqe_cobyla_multi_seed`, `SeedStatistics`, and
-  `VQEMultiSeedResult` in `vqe.py` for seed-level VQE reporting (#6).
-- NB02: mean ± std table, per-seed CSV (`data/vqe_seeds_n9.csv`), box plot
-  (`figures/vqe_seed_distribution.png`).
-- NB05: multi-seed N=12 via `run_vqe_cobyla_multi_seed`, cross-size box plot
-  (`figures/vqe_seed_scaling_boxplot.png`).
+- `CITATION.cff` and package metadata: author Vladimiros Peilivanidis with
+  ARPA Quantum Logical Systems (QONDRA); Zenodo-ready CFF fields (`type: software`).
 
 ## [0.1.2] - 2026-07-03
 

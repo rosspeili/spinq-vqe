@@ -1,14 +1,24 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
+type: software
 title: "spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians"
-version: "0.1.2"
-date-released: 2026-07-03
+version: "0.1.3"
+date-released: 2026-07-27
 url: "https://github.com/ARPAQLS/spinq-vqe"
 repository-code: "https://github.com/ARPAQLS/spinq-vqe"
 license: MIT
 authors:
+  - family-names: Peilivanidis
+    given-names: Vladimiros
+    email: "qondra@arpacorp.net"
+    affiliation: "ARPA Quantum Logical Systems (QONDRA)"
   - name: "ARPA Quantum Logical Systems (QONDRA)"
     email: "qondra@arpacorp.net"
+# After the first Zenodo deposit, set the concept DOI (always resolves to latest version):
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.XXXXXXX
+#     description: Zenodo concept DOI for this software
 keywords:
   - quantum computing
   - variational quantum eigensolver
@@ -17,3 +27,9 @@ keywords:
   - antiferromagnetic Hamiltonians
   - kagome lattice
   - spintronics
+  - software
+abstract: >-
+  spinq-vqe provides PennyLane-based variational quantum eigensolver (VQE) and
+  QAOA workflows for Kagome antiferromagnets and spin-orbit-torque material
+  screening, with exact-diagonalization benchmarks, entanglement diagnostics,
+  and reproducible notebooks.

@@ -12,6 +12,8 @@ Part of [ARPA Quantum Logical Systems — QONDRA](https://github.com/arpaqls) &n
 ![PennyLane](https://img.shields.io/badge/PennyLane-0.39%2B-DBD3DC?style=flat-square&labelColor=756F6A)
 [![License](https://img.shields.io/badge/License-MIT-F4ECC8?style=flat-square&labelColor=756F6A)](LICENSE)
 ![Optimizer](https://img.shields.io/badge/Optimizer-COBYLA%2FAdam-F0D9CC?style=flat-square&labelColor=756F6A)
+![Version](https://img.shields.io/badge/version-v0.1.3-B8B8E8?style=flat-square&labelColor=756F6A)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.XXXXXXX-E8A598?style=flat-square&labelColor=756F6A)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 
 </div>
@@ -153,6 +155,14 @@ Six test modules covering all library functions. Runs in under 90 seconds on CPU
 
 See [`REFERENCES.md`](REFERENCES.md) for the full bibliography.  
 Key: Sachdev (1992), Yan/Huse/White (2011), Wiersema et al. (2020), Kandala et al. (2017), Cerezo et al. (2021), Farhi et al. (2014).
+
+## Citation
+
+If you use this software, please cite [`CITATION.cff`](CITATION.cff):
+
+> Peilivanidis, V., & ARPA Quantum Logical Systems (QONDRA). (2026). *spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians* (v0.1.3). https://github.com/ARPAQLS/spinq-vqe
+
+After Zenodo archival, replace the DOI badge placeholder above with the **concept DOI** (stable link to the latest archived version). Prefer citing the software DOI for the code artifact; cite the paper DOI separately once the manuscript is published.
 
 ---
 
