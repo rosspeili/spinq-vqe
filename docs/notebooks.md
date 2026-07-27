@@ -143,6 +143,24 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 - `figures/qaoa_material_ranking.png`
 - `data/qaoa_results.csv`
 
+### Data provenance and scope boundary
+
+`data/mp_theta_sh.csv` combines two different kinds of information:
+
+- Materials Project metadata: `mp_id`, formula, crystal system, space group, band gap, magnetic flag, and related structure descriptors.
+- Curated literature labels: `theta_sh` and anomalous Hall conductivity values used as the supervised target for the surrogate.
+
+Materials Project is therefore used as a structure and metadata source here; it is not treated as the source of the spin Hall angle labels. The refresh script (`scripts/fetch_mp_theta_sh.py`) can update Materials Project descriptors when `MP_API_KEY` is available, while the `theta_sh` labels remain curated literature inputs unless explicitly revised.
+
+NB04 should be read as a small reproducibility and method-demonstration notebook:
+
+- It tests whether the committed 12-material table can drive a surrogate-plus-QAOA workflow end to end.
+- It compares QAOA selections against greedy and simulated-annealing baselines on the same oracle.
+- It does not claim a new experimentally validated material discovery.
+- It does not replace a larger literature review, DFT campaign, or laboratory validation.
+
+The main guarded conclusion is that, for the current 12-material surrogate oracle, classical baselines outperform the tested QAOA depths. That is a useful negative/diagnostic result and a boundary for future scaling work.
+
 **Results (k=3 from N=12 materials):**
 
 | Method | Total θ_SH | Selected |

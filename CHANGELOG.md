@@ -8,6 +8,11 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+### Changed
+
+- Clarified the NB04 data boundary in `OVERVIEW.md`: Materials Project provides
+  structure metadata, θ_SH targets remain curated literature labels, and the
+  notebook demonstrates the method rather than claiming material discovery.
 ### Added
 
 - `seed_statistics`, `run_vqe_cobyla_multi_seed`, `SeedStatistics`, and
