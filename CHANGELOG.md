@@ -8,6 +8,19 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-07-27
+
+### Added
+
+- Zenodo concept DOI `10.5281/zenodo.21628505` in `README.md`, `CITATION.cff`,
+  and `OVERVIEW.md`.
+
+### Changed
+
+- `CITATION.cff` notes/message clarified: cite the software concept DOI for the
+  code artifact; cite any related paper DOI separately.
+- Package version bumped to 0.1.4.
+
 ## [0.1.3] - 2026-07-27
 
 ### Added

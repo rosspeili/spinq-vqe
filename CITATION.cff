@@ -1,8 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it using the metadata below."
+message: >-
+  Please cite this software when using spinq-vqe for VQE/QAOA workflows,
+  Kagome antiferromagnet simulations, or SOC material screening. Prefer the
+  Zenodo concept DOI below for the code artifact; cite any related paper DOI
+  separately once published.
 type: software
 title: "spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians"
-version: "0.1.3"
+version: "0.1.4"
 date-released: 2026-07-27
 url: "https://github.com/ARPAQLS/spinq-vqe"
 repository-code: "https://github.com/ARPAQLS/spinq-vqe"
@@ -15,20 +19,29 @@ authors:
     orcid: "https://orcid.org/0009-0003-0121-465X"
   - name: "ARPA Quantum Logical Systems (QONDRA)"
     email: "qondra@arpacorp.net"
-# After the first Zenodo deposit, set the concept DOI (always resolves to latest version):
-# identifiers:
-#   - type: doi
-#     value: 10.5281/zenodo.XXXXXXX
-#     description: Zenodo concept DOI for this software
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21628505
+    description: Zenodo concept DOI (resolves to the latest archived version)
 keywords:
   - quantum computing
+  - quantum machine learning
   - variational quantum eigensolver
   - VQE
   - QAOA
+  - PennyLane
+  - JAX
+  - antiferromagnetism
   - antiferromagnetic Hamiltonians
   - kagome lattice
+  - Mn3Sn
   - spintronics
-  - software
+  - spin-orbit torque
+  - spin Hall effect
+  - entanglement
+  - exact diagonalization
+  - hardware-efficient ansatz
+  - MERA
 abstract: >-
   spinq-vqe provides PennyLane-based variational quantum eigensolver (VQE) and
   QAOA workflows for Kagome antiferromagnets and spin-orbit-torque material

@@ -129,9 +129,9 @@ The Kagome AFM Hamiltonian computed here is intended as the physical foundation 
 
 If you use this software, please cite using the metadata in [`CITATION.cff`](CITATION.cff):
 
-> Peilivanidis, V., & ARPA Quantum Logical Systems (QONDRA). (2026). *spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians* (v0.1.3). https://github.com/ARPAQLS/spinq-vqe
+> Peilivanidis, V., & ARPA Quantum Logical Systems (QONDRA). (2026). *spinq-vqe: Variational Quantum Simulation of Antiferromagnetic Hamiltonians* (v0.1.4). https://doi.org/10.5281/zenodo.21628505
 
-A Zenodo **software** concept DOI will be added after the first archived GitHub release. Cite the software DOI for the code; cite the paper DOI separately when the manuscript is published.
+Zenodo concept DOI: [10.5281/zenodo.21628505](https://doi.org/10.5281/zenodo.21628505) (resolves to the latest archived version). Cite the software DOI for the code; cite any paper DOI separately when the manuscript is published.
 
 ---
 
