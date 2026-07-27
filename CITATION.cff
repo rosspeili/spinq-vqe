@@ -12,6 +12,7 @@ authors:
     given-names: Vladimiros
     email: "qondra@arpacorp.net"
     affiliation: "ARPA Quantum Logical Systems (QONDRA)"
+    orcid: "https://orcid.org/0009-0003-0121-465X"
   - name: "ARPA Quantum Logical Systems (QONDRA)"
     email: "qondra@arpacorp.net"
 # After the first Zenodo deposit, set the concept DOI (always resolves to latest version):
