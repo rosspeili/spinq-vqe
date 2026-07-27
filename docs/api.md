@@ -223,6 +223,9 @@ from spinq_vqe import qaoa
 | `build_cost_hamiltonian(theta_sh, k, lam)` | QUBO cost Hamiltonian |
 | `build_mixer_hamiltonian(n_materials)` | Transverse-field X mixer |
 | `run_qaoa(theta_sh, k, p, ...)` | Full QAOA optimization (COBYLA) |
+| `evaluate_qaoa_cost(theta_sh, params, k, p, lam)` | Single cost evaluation |
+| `qaoa_landscape_grid(theta_sh, k, lam, n_gamma, n_beta)` | Sample p=1 (γ, β) landscape |
+| `find_landscape_minima(landscape)` | Coarse local minima on a landscape grid |
 | `classical_greedy(theta_sh, k)` | Top-k greedy baseline → `list[int]` of selected indices |
 | `classical_simulated_annealing(theta_sh, k, ...)` | SA baseline |
 | `qaoa_summary(result, formulas)` | Print result summary |
@@ -251,5 +254,6 @@ from spinq_vqe import utils
 | `plot_entanglement_profile(profile, ...)` | S_vN vs subsystem size |
 | `plot_mutual_info_matrix(matrix, ...)` | Sublattice MI heatmap |
 | `plot_gradient_variance(results, ...)` | Barren plateau diagnostic |
+| `plot_qaoa_landscape(gamma, beta, energies, ...)` | NB04 landscape + θ_SH depth panel |
 
 All plots use a consistent soft pastel palette (`SUBLATTICE_COLORS`, `ANSATZ_COLORS`).

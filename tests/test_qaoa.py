@@ -15,6 +15,9 @@ from spinq_vqe.qaoa import (
     build_cost_hamiltonian,
     build_mixer_hamiltonian,
     classical_greedy,
+    evaluate_qaoa_cost,
+    find_landscape_minima,
+    qaoa_landscape_grid,
     run_qaoa,
 )
 
@@ -127,3 +130,51 @@ class TestClassicalGreedy:
     def test_k_1_selects_best(self):
         idx = classical_greedy(THETA_SH_4, k=1)
         assert idx == [2]  # CrTe2 has max θ_SH = 0.40
+
+
+# ---------------------------------------------------------------------------
+# Landscape utilities
+# ---------------------------------------------------------------------------
+
+
+class TestQAOALandscape:
+    def test_evaluate_cost_matches_run_shape(self):
+        params = np.array([0.5, 1.0])
+        e = evaluate_qaoa_cost(THETA_SH_4, params, k=2, p=1, lam=5.0)
+        assert np.isfinite(e)
+
+    def test_landscape_grid_shape(self):
+        grid = qaoa_landscape_grid(
+            THETA_SH_4,
+            k=2,
+            lam=5.0,
+            n_gamma=5,
+            n_beta=4,
+        )
+        assert grid.energies.shape == (5, 4)
+        assert np.all(np.isfinite(grid.energies))
+
+    def test_find_landscape_minima(self):
+        grid = qaoa_landscape_grid(
+            THETA_SH_4,
+            k=2,
+            lam=5.0,
+            n_gamma=7,
+            n_beta=7,
+        )
+        minima = find_landscape_minima(grid, neighborhood=3, max_minima=3)
+        assert len(minima) >= 1
+        assert all(len(m) == 3 for m in minima)
+
+    def test_param_history_recorded(self):
+        result = run_qaoa(
+            THETA_SH_4,
+            k=2,
+            p=1,
+            n_optimizer_steps=10,
+            n_seeds=1,
+            verbose=False,
+            record_param_history=True,
+        )
+        assert len(result.param_history) > 0
+        assert result.param_history[0].shape == (2,)
