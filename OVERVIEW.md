@@ -135,4 +135,4 @@ A Zenodo DOI will be added when the first paper-linked release is archived.
 
 ---
 
-*Last updated: 2026-07-03 · Part of the ARPA Spintronics QML Research Program*
+*Last updated: 2026-07-27 · Part of the ARPA Spintronics QML Research Program*

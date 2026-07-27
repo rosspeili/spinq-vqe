@@ -355,6 +355,70 @@ def plot_gradient_variance(
 # ---------------------------------------------------------------------------
 
 
+def _grid_edges(centers: np.ndarray) -> np.ndarray:
+    """Cell boundaries for a uniformly sampled 1-D angle grid."""
+    centers = np.asarray(centers, dtype=float)
+    if len(centers) == 1:
+        return np.array([centers[0] - 0.5, centers[0] + 0.5])
+    diffs = np.diff(centers)
+    edges = np.empty(len(centers) + 1)
+    edges[1:-1] = centers[:-1] + diffs / 2
+    edges[0] = centers[0] - diffs[0] / 2
+    edges[-1] = centers[-1] + diffs[-1] / 2
+    return edges
+
+
+def _wrap_qaoa_angles(
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    *,
+    gamma_period: float = 2 * np.pi,
+    beta_period: float = np.pi,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Map QAOA angles into the standard landscape window for plotting."""
+    return np.mod(gamma, gamma_period), np.mod(beta, beta_period)
+
+
+def _plot_wrapped_qaoa_path(
+    ax: plt.Axes,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    *,
+    color: str = "#FFFFFF",
+    lw: float = 1.2,
+    alpha: float = 0.75,
+    label: str = "COBYLA path",
+    gamma_period: float = 2 * np.pi,
+    beta_period: float = np.pi,
+) -> None:
+    """Plot a COBYLA trajectory without spurious lines from angle wrapping."""
+    g, b = _wrap_qaoa_angles(gamma, beta, gamma_period=gamma_period, beta_period=beta_period)
+    if len(g) < 2:
+        ax.scatter(b, g, color=color, s=12, alpha=alpha, label=label, zorder=5)
+        return
+
+    segments: list[np.ndarray] = []
+    current = np.column_stack([b[:1], g[:1]])
+    for i in range(1, len(g)):
+        if abs(g[i] - g[i - 1]) > gamma_period / 2 or abs(b[i] - b[i - 1]) > beta_period / 2:
+            segments.append(current)
+            current = np.column_stack([b[i : i + 1], g[i : i + 1]])
+        else:
+            current = np.vstack([current, [b[i], g[i]]])
+    segments.append(current)
+
+    for idx, seg in enumerate(segments):
+        ax.plot(
+            seg[:, 0],
+            seg[:, 1],
+            color=color,
+            lw=lw,
+            alpha=alpha,
+            label=label if idx == 0 else "_nolegend_",
+            zorder=5,
+        )
+
+
 def plot_qaoa_landscape(
     gamma: np.ndarray,
     beta: np.ndarray,
@@ -364,7 +428,8 @@ def plot_qaoa_landscape(
     cobyla_beta: float | None = None,
     param_trajectory: list[np.ndarray] | None = None,
     local_minima: list[tuple[float, float, float]] | None = None,
-    depth_energies: dict[int, float] | None = None,
+    depth_theta_sh: dict[int, float] | None = None,
+    classical_theta_sh: float | None = None,
     figsize: tuple[float, float] = (12.0, 4.8),
     save_path: str | None = None,
 ) -> plt.Figure:
@@ -383,16 +448,27 @@ def plot_qaoa_landscape(
         COBYLA parameter vectors (p=1: each shape ``(2,)``).
     local_minima : list of (γ, β, E), optional
         Coarse local minima from ``find_landscape_minima``.
-    depth_energies : dict[int, float], optional
-        Best QAOA cost vs circuit depth ``p``.
+    depth_theta_sh : dict[int, float], optional
+        Total selected θ_SH vs QAOA depth ``p`` (higher = better ranking).
+    classical_theta_sh : float, optional
+        Greedy baseline total θ_SH (horizontal reference line).
     """
     fig, axes = plt.subplots(1, 2, figsize=figsize)
 
     ax = axes[0]
-    gg, bb = np.meshgrid(beta, gamma)
-    cf = ax.contourf(gg, bb, energies, levels=30, cmap="viridis", alpha=0.92)
-    ax.contour(gg, bb, energies, levels=12, colors="white", linewidths=0.4, alpha=0.5)
-    cbar = fig.colorbar(cf, ax=ax, fraction=0.046, pad=0.04)
+    beta_edges = _grid_edges(np.asarray(beta, dtype=float))
+    gamma_edges = _grid_edges(np.asarray(gamma, dtype=float))
+    bb, gg = np.meshgrid(beta_edges, gamma_edges)
+    mesh = ax.pcolormesh(
+        bb,
+        gg,
+        energies,
+        cmap="viridis",
+        shading="flat",
+        alpha=0.95,
+        rasterized=True,
+    )
+    cbar = fig.colorbar(mesh, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("QAOA cost ⟨H_C⟩", color="#555555", fontsize=10)
 
     if local_minima:
@@ -411,20 +487,16 @@ def plot_qaoa_landscape(
     if param_trajectory:
         traj = np.asarray(param_trajectory)
         if traj.ndim == 2 and traj.shape[1] >= 2:
-            ax.plot(
-                traj[:, 1],
-                traj[:, 0],
-                color="#FFFFFF",
-                lw=1.2,
-                alpha=0.75,
-                label="COBYLA path",
-                zorder=5,
-            )
+            _plot_wrapped_qaoa_path(ax, traj[:, 0], traj[:, 1])
 
     if cobyla_gamma is not None and cobyla_beta is not None:
+        cg, cb = _wrap_qaoa_angles(
+            np.asarray([cobyla_gamma]),
+            np.asarray([cobyla_beta]),
+        )
         ax.scatter(
-            [cobyla_beta],
-            [cobyla_gamma],
+            cb,
+            cg,
             s=90,
             color="#E8A598",
             edgecolors="white",
@@ -444,21 +516,33 @@ def plot_qaoa_landscape(
     ax.legend(fontsize=8, framealpha=0.9, loc="upper right")
 
     ax2 = axes[1]
-    if depth_energies:
-        depths = sorted(depth_energies)
-        costs = [depth_energies[p] for p in depths]
+    if depth_theta_sh:
+        depths = sorted(depth_theta_sh)
+        totals = [depth_theta_sh[p] for p in depths]
         bars = ax2.bar(
             [str(p) for p in depths],
-            costs,
+            totals,
             color=ANSATZ_COLORS["hea"],
             alpha=0.85,
             edgecolor="white",
         )
         ax2.bar_label(bars, fmt="%.2f", fontsize=9, color="#444444")
+        ymin = min(totals + ([classical_theta_sh] if classical_theta_sh is not None else []))
+        ymax = max(totals + ([classical_theta_sh] if classical_theta_sh is not None else []))
+        ax2.set_ylim(bottom=min(0.0, ymin) - 0.35, top=ymax * 1.08 + 0.05)
+        if classical_theta_sh is not None:
+            ax2.axhline(
+                classical_theta_sh,
+                color="#C7E4CA",
+                linestyle="--",
+                linewidth=1.8,
+                label=f"greedy ({classical_theta_sh:.2f})",
+            )
+            ax2.legend(fontsize=8, framealpha=0.9, loc="lower right")
         ax2.set_xlabel("QAOA depth p")
-        ax2.set_ylabel("Best cost ⟨H_C⟩")
+        ax2.set_ylabel("Total θ_SH (selected k)")
         ax2.set_title(
-            "Cost vs circuit depth",
+            "Material ranking vs depth (higher is better)",
             fontsize=12,
             fontweight="semibold",
             color="#333333",

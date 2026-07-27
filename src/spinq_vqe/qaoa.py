@@ -367,7 +367,7 @@ def find_landscape_minima(
     if neighborhood % 2 == 0:
         neighborhood += 1
 
-    filtered = minimum_filter(landscape.energies, size=neighborhood, mode="wrap")
+    filtered = minimum_filter(landscape.energies, size=neighborhood, mode="nearest")
     mask = np.isclose(landscape.energies, filtered, rtol=0.0, atol=1e-8)
     coords = np.argwhere(mask)
 

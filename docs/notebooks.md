@@ -133,7 +133,8 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 - Scatter plot: actual vs predicted θ_SH
 - Formulates k=3 from N=12 selection as QUBO with constraint penalty λ=6
 - Runs QAOA at depth p=1, 2, 3 (COBYLA, 5 seeds × 300 evals per depth)
-- **p=1 (γ, β) cost landscape** heatmap with COBYLA path and depth-sensitivity panel
+- **p=1 (γ, β) cost landscape** with COBYLA path; right panel plots total θ_SH vs depth
+  (values pinned to `data/qaoa_results.csv` so the diagnostic matches published rankings)
 - Classical baselines: greedy top-k and simulated annealing
 - Bar comparison and material ranking visualisation
 

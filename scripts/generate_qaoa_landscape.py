@@ -16,10 +16,31 @@ from spinq_vqe import qaoa, surrogate, utils
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "figures" / "qaoa_landscape.png"
+CSV = REPO / "data" / "qaoa_results.csv"
 
 LAM = 6.0
 K = 3
 GRID = 40
+
+
+def _depth_theta_from_csv() -> tuple[dict[int, float], float]:
+    """Load QAOA depths and greedy baseline from committed NB04 CSV."""
+    import csv
+
+    depth: dict[int, float] = {}
+    classical = 0.0
+    with CSV.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            method = row["method"]
+            total = float(row["total_theta_sh"])
+            if method == "Greedy":
+                classical = total
+            elif method.startswith("QAOA_p"):
+                p = int(method.split("p", 1)[1])
+                depth[p] = total
+    if not depth or classical == 0.0:
+        raise RuntimeError(f"Could not parse depth/greedy rows from {CSV}")
+    return depth, classical
 
 
 def main() -> None:
@@ -58,20 +79,7 @@ def main() -> None:
         record_param_history=True,
     )
 
-    depth_energies: dict[int, float] = {1: res_p1.energy}
-    for p in (2, 3):
-        print(f"QAOA depth p={p} (cost only)...")
-        res = qaoa.run_qaoa(
-            theta_oracle,
-            k=K,
-            p=p,
-            lam=LAM,
-            n_optimizer_steps=300,
-            n_seeds=5,
-            step_size=0.3,
-            verbose=False,
-        )
-        depth_energies[p] = res.energy
+    depth_theta, classical_theta = _depth_theta_from_csv()
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     utils.plot_qaoa_landscape(
@@ -82,7 +90,8 @@ def main() -> None:
         cobyla_beta=float(res_p1.beta[0]),
         param_trajectory=res_p1.param_history,
         local_minima=minima,
-        depth_energies=depth_energies,
+        depth_theta_sh=depth_theta,
+        classical_theta_sh=classical_theta,
         save_path=str(OUT),
     )
     print(f"Saved -> {OUT.relative_to(REPO)}")

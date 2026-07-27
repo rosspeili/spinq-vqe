@@ -254,6 +254,6 @@ from spinq_vqe import utils
 | `plot_entanglement_profile(profile, ...)` | S_vN vs subsystem size |
 | `plot_mutual_info_matrix(matrix, ...)` | Sublattice MI heatmap |
 | `plot_gradient_variance(results, ...)` | Barren plateau diagnostic |
-| `plot_qaoa_landscape(gamma, beta, energies, ...)` | NB04 landscape + depth sensitivity |
+| `plot_qaoa_landscape(gamma, beta, energies, ...)` | NB04 landscape + θ_SH depth panel |
 
 All plots use a consistent soft pastel palette (`SUBLATTICE_COLORS`, `ANSATZ_COLORS`).
