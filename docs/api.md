@@ -185,7 +185,7 @@ from spinq_vqe import surrogate
 | `load_theta_sh_data()` | **Primary** — load `data/mp_theta_sh.csv` (committed, no API key) |
 | `load_theta_sh_csv(path)` | Load CSV directly |
 | `load_mock_data()` | Offline fallback for unit tests only |
-| `fetch_curated_mp_dataset(api_key)` | Fetch MP descriptors + literature θ_SH (refresh) |
+| `fetch_curated_mp_dataset(api_key)` | Fetch MP descriptors + illustrative oracle targets (refresh) |
 | `load_mp_data(api_key)` | Same as fetch, returns dataset only |
 | `save_theta_sh_csv(dataset, path, extra)` | Write CSV after a refresh |
 | `build_features(dataset)` | Extract feature matrix `(N, 6)` |

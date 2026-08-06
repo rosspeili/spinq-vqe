@@ -34,7 +34,7 @@ The pipeline builds the lattice graph (NetworkX), maps spin operators to Pauli s
 
 The spin Hall angle (θ_SH) is the figure of merit for spin-orbit torque efficiency. Selecting the top-k materials from N candidates is a combinatorial optimization problem, solved here with **QAOA** using a classical **MLP surrogate** as the oracle (trained on a 12-material dataset in `data/mp_theta_sh.csv`; optional refresh via Materials Project API).
 
-Materials Project supplies the structure metadata, while the θ_SH targets remain curated literature labels. NB04 is a reproducibility and method-demonstration workflow on the committed 12-material surrogate oracle rather than a new material-discovery claim.
+Materials Project supplies the structure metadata, while the θ_SH targets are a fixed illustrative oracle (`illustrative_oracle` in `data/mp_theta_sh.csv`). NB04 is a reproducibility and method-demonstration workflow on the committed 12-material surrogate oracle rather than a new material-discovery claim.
 
 **Decisions made in this release:** classical surrogate oracle (not raw DFT per evaluation); QAOA depths p = 1, 2, 3 compared against greedy and simulated-annealing baselines; k = 3 selected from N = 12 materials; p=1 (γ, β) landscape and depth-sensitivity plot (`figures/qaoa_landscape.png`) show that shallow QAOA can stall in a suboptimal basin while classical baselines reach the global optimum.
 
@@ -135,7 +135,7 @@ Zenodo concept DOI: [10.5281/zenodo.21628505](https://doi.org/10.5281/zenodo.216
 
 ---
 
-*Last updated: 2026-07-27 · Part of the ARPA Spintronics QML Research Program*
+*Last updated: 2026-08-06 · Part of the ARPA Spintronics QML Research Program*
 
 ## SOC QAOA provenance boundary
 

@@ -128,7 +128,7 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 
 **File:** [`04_soc_qaoa.ipynb`](../notebooks/04_soc_qaoa.ipynb)  
 **What it does:**
-- Loads θ_SH dataset from `data/mp_theta_sh.csv` (12 spintronic materials; MP descriptors + literature θ_SH)
+- Loads θ_SH dataset from `data/mp_theta_sh.csv` (12 spintronic materials; MP descriptors + illustrative oracle targets)
 - Trains MLP surrogate (`surrogate.train_surrogate`)
 - Scatter plot: actual vs predicted θ_SH
 - Formulates k=3 from N=12 selection as QUBO with constraint penalty λ=6
@@ -151,9 +151,9 @@ Sites 0 and 1 form a near-perfect Bell pair (singlet on that bond).
 `data/mp_theta_sh.csv` combines two different kinds of information:
 
 - Materials Project metadata: `mp_id`, formula, crystal system, space group, band gap, magnetic flag, and related structure descriptors.
-- Curated literature labels: `theta_sh` and anomalous Hall conductivity values used as the supervised target for the surrogate.
+- Illustrative oracle targets: `theta_sh` and anomalous Hall conductivity values used as the supervised target for the surrogate (see `data/theta_sh_provenance.csv`).
 
-Materials Project is therefore used as a structure and metadata source here; it is not treated as the source of the spin Hall angle labels. The refresh script (`scripts/fetch_mp_theta_sh.py`) can update Materials Project descriptors when `MP_API_KEY` is available, while the `theta_sh` labels remain curated literature inputs unless explicitly revised.
+Materials Project is therefore used as a structure and metadata source here; it is not treated as the source of the spin Hall angle labels. The refresh script (`scripts/fetch_mp_theta_sh.py`) can update Materials Project descriptors when `MP_API_KEY` is available, while the `theta_sh` targets remain the committed illustrative oracle unless explicitly revised.
 
 NB04 should be read as a small reproducibility and method-demonstration notebook:
 

@@ -8,6 +8,19 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+### Added
+
+- θ_SH provenance contract (`data/theta_sh_sources.md`) and row-level ledger
+  (`data/theta_sh_provenance.csv`) for NB04 (#22, #29).
+- Contract test requiring every committed oracle row to be explicitly sourced or
+  illustrative.
+
+### Changed
+
+- Reclassified all 12 committed `theta_sh` targets as `illustrative_oracle`
+  (not unqualified `literature`); aligned README, OVERVIEW, NB04, `surrogate.py`,
+  and `docs/notebooks.md` with the same scientific boundary (#22, #29).
+
 ## [0.1.4] - 2026-07-27
 
 ### Added

@@ -119,4 +119,4 @@ When adding a new module or extending an existing one:
 
 ---
 
-*Last updated: 2026-07-27 · spinq-vqe v0.1.4*
+*Last updated: 2026-08-06 · spinq-vqe v0.1.4*
