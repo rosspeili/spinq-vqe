@@ -37,10 +37,11 @@ tests/
 ├── test_entanglement.py    # Reduced density matrix + Von Neumann entropy
 ├── test_surrogate.py       # CSV + mock data, feature extraction, MLP training, prediction
 ├── test_qaoa.py            # Cost/mixer Hamiltonians, QAOA run, classical greedy
-└── test_dmrg.py            # TeNPy Hamiltonian match + N=9 DMRG energy (optional dep)
+├── test_dmrg.py            # TeNPy Hamiltonian match + N=9 DMRG energy (optional dep)
+└── test_nqs.py             # NetKet Hamiltonian match + complex RBM vs ED (optional dep)
 ```
 
-All tests use **N=3** (one Kagome unit cell, 3 sites) or **N=4** (QAOA) with minimal optimizer steps. The full suite runs in **under 90 seconds** on CPU.
+All tests use **N=3** (one Kagome unit cell, 3 sites) or **N=4** (QAOA) with minimal optimizer steps, except optional DMRG/NQS physics checks at N=9. The core suite (without `[dmrg]`/`[nqs]`) runs in **under 90 seconds** on CPU.
 
 ---
 
@@ -55,6 +56,7 @@ All tests use **N=3** (one Kagome unit cell, 3 sites) or **N=4** (QAOA) with min
 | `surrogate.py` | `test_surrogate.py` | CSV load (`mp_theta_sh.csv`), mock fallback, Mn₃Sn + real MP ID, feature matrix, training, prediction |
 | `qaoa.py` | `test_qaoa.py` | Cost/mixer Hamiltonian types, QAOA result structure, landscape grid, param history, classical greedy top-k |
 | `dmrg.py` | `test_dmrg.py` | TeNPy/PennyLane Hamiltonian match, N=9 energy vs ED (< 0.01%), CSV round-trip (skipped if `physics-tenpy` not installed) |
+| `nqs.py` | `test_nqs.py` | NetKet/PennyLane Hamiltonian match, complex RBM N=9 <5% vs ED, real RBM plateau check, CSV round-trip (skipped if `netket` not installed) |
 
 ---
 
@@ -106,6 +108,7 @@ ruff check src/
 
 - **No convergence test for VQE on real physics.** N=3 with 30 function evaluations is enough to verify the runner works, not to verify it reaches the true ground state. The notebooks (`NB02`, `NB05`, `NB06`) carry the physics-level validation.
 - **DMRG tests require `physics-tenpy`.** `test_dmrg.py` uses `pytest.importorskip("tenpy")` and is skipped when the optional `[dmrg]` extra is not installed.
+- **NQS tests require `netket`.** `test_nqs.py` uses `pytest.importorskip("netket")` and is skipped when the optional `[nqs]` extra is not installed. The complex-RBM check is slower than core unit tests (~1–2 min).
 - **No GPU tests.** All tests use `default.qubit` (CPU). `lightning.qubit` and JAX backends are exercised in notebooks only.
 - **QAOA k-constraint test is probabilistic.** `run_qaoa` selects k materials by sampling from the optimized circuit. With very few optimizer steps the selection is not guaranteed to satisfy the constraint. The test uses a tolerance-free `len(selected_indices) == k` check — if the QAOA rarely fails this, the implementation correctly decodes the argmax bitstring.
 

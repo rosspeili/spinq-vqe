@@ -263,6 +263,31 @@ print(res.e0, res.chi)  # normalized E0/site, bond dimension used
 
 ---
 
+## `spinq_vqe.nqs`
+
+NetKet Neural Quantum State baselines for 1D Kagome strips (NB07). Requires `pip install -e ".[nqs]"`.
+
+```python
+from spinq_vqe import nqs
+```
+
+| Function | Signature | Returns |
+|----------|-----------|---------|
+| `build_kagome_netket_hamiltonian` | `(n_cells, J=..., D=...)` | `(hilbert, H, graph)` |
+| `validate_hamiltonian_against_pennylane` | `(n_cells, ...)` | `float` max matrix difference |
+| `run_nqs` | `(n_cells, model='rbm', ...)` | `NQSResult` |
+| `save_method_comparison_csv` | `(rows, path)` | `Path` |
+| `load_method_comparison_csv` | `(path)` | `list[dict]` |
+
+Default `model='rbm'` uses **complex** parameters and `backend='auto'` (exact full summation for N≤12). Real RBMs cannot represent the Kagome sign structure on this strip.
+
+```python
+res = nqs.run_nqs(n_cells=3, model="rbm", n_iter=400, alpha=2.0)
+print(res.e0, res.backend)  # normalized E0/site, 'exact' or 'sampled'
+```
+
+---
+
 ## `spinq_vqe.utils`
 
 Publication-quality plot helpers.

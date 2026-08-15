@@ -266,6 +266,37 @@ Regenerate committed figures and CSV via `python scripts/run_dmrg_benchmark.py`.
 
 ---
 
+## 07 — NQS Comparison (NetKet)
+
+**File:** [`07_nqs_comparison.ipynb`](../notebooks/07_nqs_comparison.ipynb)  
+**Install:** `pip install -e ".[nqs]"`  
+**What it does:**
+- Builds the Kagome strip Hamiltonian in NetKet matching `kagome.heisenberg_kagome_hamiltonian`
+- Optimizes complex RBM and RBMModPhase wavefunctions (exact full-summation VMC for N≤12)
+- Documents why real-valued RBMs fail on this frustrated strip (sign structure)
+- Four-way comparison: ED / DMRG / NQS / VQE on the same normalized energies
+- Saves `data/method_comparison.csv` and NQS-only figures (does not overwrite DMRG artifacts)
+
+**Key outputs:**
+- `figures/nqs_vmc_convergence.png`
+- `figures/nqs_method_comparison.png`
+- `figures/nqs_error_vs_ed.png`
+- `data/method_comparison.csv`
+
+Regenerate committed figures and CSV via `python scripts/run_nqs_benchmark.py`.
+
+<table>
+<tr>
+<td><img src="../figures/nqs_vmc_convergence.png" alt="NQS convergence" width="100%"></td>
+<td><img src="../figures/nqs_error_vs_ed.png" alt="NQS vs VQE error" width="100%"></td>
+</tr>
+<tr>
+<td colspan="2"><img src="../figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE" width="100%"></td>
+</tr>
+</table>
+
+---
+
 ## Running a specific notebook
 
 ```bash

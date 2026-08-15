@@ -51,11 +51,12 @@ spinq-vqe/
 │   ├── utils.py         # Publication-quality plot helpers
 │   ├── surrogate.py     # MLP surrogate for spin Hall angle prediction
 │   ├── qaoa.py          # QAOA circuit + optimizer for material selection
-│   └── dmrg.py          # TeNPy DMRG reference energies (NB06)
+│   ├── dmrg.py          # TeNPy DMRG reference energies (NB06)
+│   └── nqs.py           # NetKet Neural Quantum State baselines (NB07)
 ├── notebooks/           # Executable research notebooks
 ├── figures/             # Generated plots
-├── data/                # ED/VQE/QAOA CSVs, mp_theta_sh.csv, statevectors
-├── scripts/             # fetch_mp_theta_sh.py — refresh MP dataset (optional)
+├── data/                # ED/VQE/QAOA/DMRG/NQS CSVs, mp_theta_sh.csv, statevectors
+├── scripts/             # Benchmarks + fetch_mp_theta_sh.py
 ├── docs/                # Guides and API reference → docs/README.md
 ├── OVERVIEW.md          # Full program description + research context
 └── REFERENCES.md        # Full bibliography (50+ references)
@@ -78,7 +79,8 @@ conda activate spinq-vqe
 
 Requires Python ≥ 3.11. Core: `pennylane ≥ 0.39`, `numpy`, `scipy`, `networkx`, `matplotlib`.  
 Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (for SOC QAOA notebooks).  
-Optional: `pip install -e ".[dmrg]"` adds `physics-tenpy` (for DMRG comparison, NB06).
+Optional: `pip install -e ".[dmrg]"` adds `physics-tenpy` (for DMRG comparison, NB06).  
+Optional: `pip install -e ".[nqs]"` adds `netket` (for Neural Quantum State comparison, NB07).
 
 **SOC QAOA data (NB04):** uses committed `data/mp_theta_sh.csv` (no API key needed). To refresh from Materials Project:
 
@@ -98,6 +100,7 @@ python scripts/fetch_mp_theta_sh.py
 | 04 | [`04_soc_qaoa.ipynb`](notebooks/04_soc_qaoa.ipynb) | surrogate MLP, QAOA p=1/2/3, material ranking, landscape diagnostic |
 | 05 | [`05_scaling_analysis.ipynb`](notebooks/05_scaling_analysis.ipynb) | N=9/12/18 scaling, gradient variance, barren plateau |
 | 06 | [`06_dmrg_comparison.ipynb`](notebooks/06_dmrg_comparison.ipynb) | TeNPy DMRG vs ED/VQE, χ convergence, entanglement profile |
+| 07 | [`07_nqs_comparison.ipynb`](notebooks/07_nqs_comparison.ipynb) | NetKet NQS (complex RBM / RBMModPhase) vs ED/DMRG/VQE |
 
 ## Key results
 
@@ -115,6 +118,15 @@ VQE errors are quoted relative to DMRG E₀.
 | 18 | — | — | — | −1.49962859 | — | DMRG = ED, gap Δ = 0.037 |
 | 24 | — | — | — | −1.50936790 | — | DMRG only (beyond ED) |
 
+### Neural Quantum State baseline (NetKet, NB07)
+
+Complex RBM / RBMModPhase on the same normalized strip Hamiltonian (exact full-summation for N≤12). New figures only (`nqs_*.png`); DMRG artifacts unchanged.
+
+| N | NQS RBM E₀ | err vs ED | NQS ModPhase E₀ | err vs ED | VQE best err |
+|---|------------|-----------|-----------------|-----------|--------------|
+| 9 | −1.42183147 | **0.005%** | −1.42181237 | 0.006% | 9.66% |
+| 12 | −1.48015452 | **0.018%** | −1.45094727 | 1.99% | 16.33% |
+
 Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). COBYLA mean ± std and per-seed
 distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
 `figures/vqe_seed_distribution.png` (regenerate via NB02).
@@ -129,6 +141,10 @@ distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
 <tr>
 <td><img src="figures/dmrg_chi_convergence.png" alt="DMRG chi convergence N=18" width="100%"></td>
 <td><img src="figures/dmrg_entanglement_profile.png" alt="DMRG vs VQE entanglement" width="100%"></td>
+</tr>
+<tr>
+<td><img src="figures/nqs_vmc_convergence.png" alt="NQS VMC convergence N=9" width="100%"></td>
+<td><img src="figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE comparison" width="100%"></td>
 </tr>
 </table>
 

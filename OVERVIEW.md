@@ -12,7 +12,7 @@ In May 2026, the University of Tokyo (Nakatsuji Lab) demonstrated **40-picosecon
 
 We cannot fabricate this material in silico, but we *can* simulate its quantum many-body physics using **Variational Quantum Eigensolvers (VQE)** and **Quantum Approximate Optimization Algorithms (QAOA)** on a classical simulator — and compare results directly to exact diagonalization and spectroscopic benchmarks.
 
-`spinq-vqe` is the open-source Python package that implements this pipeline: lattice construction, variational ansätze, VQE runners, entanglement analysis, TeNPy DMRG references, an MLP surrogate for spin Hall angle, and a QAOA material-selection optimizer. All six research notebooks are executed with published figures and reference data.
+`spinq-vqe` is the open-source Python package that implements this pipeline: lattice construction, variational ansätze, VQE runners, entanglement analysis, TeNPy DMRG references, NetKet Neural Quantum State baselines, an MLP surrogate for spin Hall angle, and a QAOA material-selection optimizer. All seven research notebooks are executed with published figures and reference data.
 
 ---
 
@@ -95,7 +95,7 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 | Component | Location | Description |
 |-----------|----------|-------------|
 | Python package | `src/spinq_vqe/` | `kagome`, `ansatz`, `vqe`, `entanglement`, `surrogate`, `qaoa`, `utils` |
-| Notebooks | `notebooks/01`–`06` | Lattice/ED, VQE, entanglement, SOC QAOA, scaling, DMRG |
+| Notebooks | `notebooks/01`–`07` | Lattice/ED, VQE, entanglement, SOC QAOA, scaling, DMRG, NQS |
 | Test suite | `tests/` | Six modules, < 90 s on CPU |
 | Documentation | `docs/` | Physics, ansätze, API, notebooks, testing |
 | Data & figures | `data/`, `figures/` | ED energies, VQE/QAOA CSVs, publication plots |
@@ -105,6 +105,7 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 ## What's next
 
 - **DMRG comparison** — benchmark VQE against density-matrix renormalization group at larger system sizes
+- **NQS comparison** — NetKet Neural Quantum State baselines (complex RBM / RBMModPhase) on the same strip Hamiltonian
 - **Expand θ_SH dataset** — add materials or refresh descriptors via `scripts/fetch_mp_theta_sh.py`
 - **2D periodic Kagome tiling** — extend beyond the 1D strip geometry
 - **Paper draft** — LaTeX manuscript targeting Physical Review B or npj Quantum Materials
