@@ -282,6 +282,14 @@ Regenerate committed figures and CSV via `python scripts/run_dmrg_benchmark.py`.
 - `figures/nqs_method_comparison.png`
 - `figures/nqs_error_vs_ed.png`
 - `data/method_comparison.csv`
+- `data/nqs_*_history_n{9,12}.csv`
+
+**Results (complex RBM / RBMModPhase, exact full-summation):**
+
+| N | ED / DMRG | NQS RBM | RBM err | ModPhase err | VQE err |
+|---|-----------|---------|---------|--------------|---------|
+| 9 | −1.4219 | −1.4218 | **0.005%** | 0.006% | 9.66% |
+| 12 | −1.4804 | −1.4802 | **0.018%** | 1.99% | 16.33% |
 
 Regenerate committed figures and CSV via `python scripts/run_nqs_benchmark.py`.
 

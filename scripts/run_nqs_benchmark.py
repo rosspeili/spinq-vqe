@@ -146,15 +146,17 @@ def main() -> None:
             }
         )
 
-        # Persist convergence histories (new files only)
-        np.save(
-            DATA / f"nqs_rbm_history_n{n_sites}.npy",
-            np.asarray(rbm.energy_history),
-        )
-        np.save(
-            DATA / f"nqs_modphase_history_n{n_sites}.npy",
-            np.asarray(mod.energy_history),
-        )
+        # Persist convergence histories as CSV (npy is gitignored).
+        for label, res in (("rbm", rbm), ("modphase", mod)):
+            hist = np.asarray(res.energy_history, dtype=float)
+            np.save(DATA / f"nqs_{label}_history_n{n_sites}.npy", hist)
+            np.savetxt(
+                DATA / f"nqs_{label}_history_n{n_sites}.csv",
+                hist,
+                delimiter=",",
+                header="energy",
+                comments="",
+            )
 
     csv_path = nqs.save_method_comparison_csv(rows, DATA / "method_comparison.csv")
     print(f"\nSaved -> {csv_path.relative_to(REPO)}")

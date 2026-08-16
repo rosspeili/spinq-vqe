@@ -14,8 +14,8 @@ frustrated Kagome sign structure and plateau far above E₀.
 References
 ----------
 - Carleo & Troyer (2017) Science 355 — Neural Quantum States
-- Astrakhantsev et al. (2021) PRX 11, 041017 — NQS on Kagome Heisenberg
-- Vieijra et al. (2021) PRL 126, 017102 — symmetry-equivariant NQS
+- Đurić et al. (2025) PRX 15, 011047 — GCNN NQS on Kagome Heisenberg
+- Vieijra et al. (2020) PRL 124, 097201 — symmetry-adapted RBM
 """
 
 from __future__ import annotations

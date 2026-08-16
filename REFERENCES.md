@@ -54,6 +54,18 @@
 
 ---
 
+## Neural Quantum States (NB07)
+
+| # | Reference | URL / DOI |
+|---|-----------|-----------|
+| N1 | Carleo, G., Troyer, M. (2017) — *Solving the quantum many-body problem with artificial neural networks.* Science 355, 602 — **NQS / RBM wavefunctions** | https://doi.org/10.1126/science.aag2302 |
+| N2 | Đurić, T. et al. (2025) — *Spin-1/2 Kagome Heisenberg Antiferromagnet: Machine Learning Discovery of the Spinon Pair-Density-Wave Ground State.* Phys. Rev. X 15, 011047 — **GCNN NQS on Kagome** | https://doi.org/10.1103/PhysRevX.15.011047 |
+| N3 | Vieijra, T. et al. (2020) — *Restricted Boltzmann Machines for Quantum States with Non-Abelian or Anyonic Symmetries.* Phys. Rev. Lett. 124, 097201 — **symmetry-adapted RBM** | https://doi.org/10.1103/PhysRevLett.124.097201 |
+| N4 | Westerhout, T., Astrakhantsev, N. et al. (2020) — *Generalization properties of neural network approximations to frustrated magnet ground states.* Nature Communications 11, 1593 | https://doi.org/10.1038/s41467-020-15402-w |
+| N5 | **NetKet** — Machine learning toolbox for many-body quantum systems | https://www.netket.org |
+
+---
+
 ## Quantum Computing Frameworks
 
 | # | Resource | URL |
@@ -77,6 +89,8 @@
 | F16 | **Matplotlib** — Publication figures | https://matplotlib.org |
 | F17 | **Plotly** — Interactive notebook plots | https://plotly.com/python |
 | F18 | **JupyterLab** | https://jupyterlab.readthedocs.io |
+| F19 | **TeNPy** — Tensor-network / DMRG reference (NB06) | https://github.com/tenpy/tenpy |
+| F20 | **NetKet** — Neural Quantum States / VMC (NB07) | https://www.netket.org |
 
 ---
 

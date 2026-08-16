@@ -120,12 +120,14 @@ VQE errors are quoted relative to DMRG E₀.
 
 ### Neural Quantum State baseline (NetKet, NB07)
 
-Complex RBM / RBMModPhase on the same normalized strip Hamiltonian (exact full-summation for N≤12). New figures only (`nqs_*.png`); DMRG artifacts unchanged.
+Same normalized strip Hamiltonian as ED/DMRG/VQE. Complex RBM recovers the ground state; VQE remains ansatz-limited. Full figure set lives in [`docs/notebooks.md`](docs/notebooks.md#07--nqs-comparison-netket) and NB07.
 
-| N | NQS RBM E₀ | err vs ED | NQS ModPhase E₀ | err vs ED | VQE best err |
-|---|------------|-----------|-----------------|-----------|--------------|
-| 9 | −1.42183147 | **0.005%** | −1.42181237 | 0.006% | 9.66% |
-| 12 | −1.48015452 | **0.018%** | −1.45094727 | 1.99% | 16.33% |
+| N | NQS RBM E₀ | err vs ED | NQS ModPhase err | VQE best err |
+|---|------------|-----------|------------------|--------------|
+| 9 | −1.42183147 | **0.005%** | 0.006% | 9.66% |
+| 12 | −1.48015452 | **0.018%** | 1.99% | 16.33% |
+
+<img src="figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE on Kagome strip" width="720">
 
 Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). COBYLA mean ± std and per-seed
 distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
@@ -141,10 +143,6 @@ distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
 <tr>
 <td><img src="figures/dmrg_chi_convergence.png" alt="DMRG chi convergence N=18" width="100%"></td>
 <td><img src="figures/dmrg_entanglement_profile.png" alt="DMRG vs VQE entanglement" width="100%"></td>
-</tr>
-<tr>
-<td><img src="figures/nqs_vmc_convergence.png" alt="NQS VMC convergence N=9" width="100%"></td>
-<td><img src="figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE comparison" width="100%"></td>
 </tr>
 </table>
 
@@ -181,7 +179,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-Six test modules covering all library functions. Runs in under 90 seconds on CPU. See [`docs/testing.md`](docs/testing.md) for the full guide.
+Core suite covers kagome/ansatz/VQE/entanglement/surrogate/QAOA (under ~90 s on CPU). Optional `[dmrg]` / `[nqs]` modules skip when those extras are not installed. See [`docs/testing.md`](docs/testing.md).
 
 ## Docs
 
@@ -192,7 +190,7 @@ Six test modules covering all library functions. Runs in under 90 seconds on CPU
 ## References
 
 See [`REFERENCES.md`](REFERENCES.md) for the full bibliography.  
-Key: Sachdev (1992), Yan/Huse/White (2011), Wiersema et al. (2020), Kandala et al. (2017), Cerezo et al. (2021), Farhi et al. (2014).
+Key: Sachdev (1992), Yan/Huse/White (2011), Carleo/Troyer (2017), Wiersema et al. (2020), Kandala et al. (2017), Cerezo et al. (2021), Farhi et al. (2014).
 
 ## Citation
 
