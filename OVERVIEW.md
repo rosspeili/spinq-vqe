@@ -12,7 +12,7 @@ In May 2026, the University of Tokyo (Nakatsuji Lab) demonstrated **40-picosecon
 
 We cannot fabricate this material in silico, but we *can* simulate its quantum many-body physics using **Variational Quantum Eigensolvers (VQE)** and **Quantum Approximate Optimization Algorithms (QAOA)** on a classical simulator — and compare results directly to exact diagonalization and spectroscopic benchmarks.
 
-`spinq-vqe` is the open-source Python package that implements this pipeline: lattice construction, variational ansätze, VQE runners, entanglement analysis, TeNPy DMRG references, an MLP surrogate for spin Hall angle, and a QAOA material-selection optimizer. All six research notebooks are executed with published figures and reference data.
+`spinq-vqe` is the open-source Python package that implements this pipeline: lattice construction, variational ansätze, VQE runners, entanglement analysis, TeNPy DMRG references, NetKet Neural Quantum State baselines, an MLP surrogate for spin Hall angle, and a QAOA material-selection optimizer. All seven research notebooks are executed with published figures and reference data.
 
 ---
 
@@ -54,6 +54,17 @@ Materials Project supplies the structure metadata, while the θ_SH targets are a
 Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). Seed-level statistics live in
 `data/vqe_results.csv` and `figures/vqe_seed_distribution.png`.
 
+### Neural Quantum State baseline (NetKet, NB07)
+
+Same normalized strip Hamiltonian as ED/DMRG/VQE. Complex RBM recovers ED; VQE remains ansatz-limited.
+
+| N | NQS RBM E₀ | err vs ED | NQS ModPhase err | VQE best err |
+|---|------------|-----------|------------------|--------------|
+| 9 | −1.42183 | **0.005%** | 0.006% | 9.66% |
+| 12 | −1.48015 | **0.018%** | 1.99% | 16.33% |
+
+Full comparison: `data/method_comparison.csv`, `figures/nqs_*.png`, notebook 07.
+
 ### Entanglement structure (N = 9 statevector)
 
 | Metric | Value | Interpretation |
@@ -81,10 +92,11 @@ This work sits at the intersection of frustrated magnetism, variational quantum 
 
 1. **Sachdev (1992)** — Kagome Heisenberg antiferromagnet and spin-liquid phases
 2. **Yan, Huse & White (2011)** — spin liquid in the Kagome Heisenberg model
-3. **Sinova et al. (2015)** — spin Hall effects in materials
-4. **Peruzzo et al. (2014)** — original VQE
-5. **Farhi et al. (2014)** — original QAOA
-6. **Cerezo et al. (2021)** — barren plateaus in variational quantum algorithms
+3. **Carleo & Troyer (2017)** — Neural Quantum States / RBM wavefunctions
+4. **Sinova et al. (2015)** — spin Hall effects in materials
+5. **Peruzzo et al. (2014)** — original VQE
+6. **Farhi et al. (2014)** — original QAOA
+7. **Cerezo et al. (2021)** — barren plateaus in variational quantum algorithms
 
 Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 
@@ -94,8 +106,8 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 
 | Component | Location | Description |
 |-----------|----------|-------------|
-| Python package | `src/spinq_vqe/` | `kagome`, `ansatz`, `vqe`, `entanglement`, `surrogate`, `qaoa`, `utils` |
-| Notebooks | `notebooks/01`–`06` | Lattice/ED, VQE, entanglement, SOC QAOA, scaling, DMRG |
+| Python package | `src/spinq_vqe/` | `kagome`, `ansatz`, `vqe`, `entanglement`, `surrogate`, `qaoa`, `dmrg`, `nqs`, `utils` |
+| Notebooks | `notebooks/01`–`07` | Lattice/ED, VQE, entanglement, SOC QAOA, scaling, DMRG, NQS |
 | Test suite | `tests/` | Six modules, < 90 s on CPU |
 | Documentation | `docs/` | Physics, ansätze, API, notebooks, testing |
 | Data & figures | `data/`, `figures/` | ED energies, VQE/QAOA CSVs, publication plots |
@@ -105,6 +117,7 @@ Full bibliography: [`REFERENCES.md`](REFERENCES.md) (50+ entries).
 ## What's next
 
 - **DMRG comparison** — benchmark VQE against density-matrix renormalization group at larger system sizes
+- **NQS comparison** — NetKet Neural Quantum State baselines (complex RBM / RBMModPhase) on the same strip Hamiltonian
 - **Expand θ_SH dataset** — add materials or refresh descriptors via `scripts/fetch_mp_theta_sh.py`
 - **2D periodic Kagome tiling** — extend beyond the 1D strip geometry
 - **Paper draft** — LaTeX manuscript targeting Physical Review B or npj Quantum Materials

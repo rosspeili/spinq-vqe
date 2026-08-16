@@ -50,7 +50,10 @@ dev = [
 dmrg = [
     "physics-tenpy",
 ]
-all = ["spinq-vqe[ed,data,dmrg,dev]"]
+nqs = [
+    "netket",
+]
+all = ["spinq-vqe[ed,data,dmrg,nqs,dev]"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

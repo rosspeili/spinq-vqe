@@ -30,8 +30,9 @@ on the 9-site Kagome strip, with mean E₀ = −1.23572 ± 0.02853 across
 5 random initializations. HVA is available for physics-motivated experiments but showed zero
 gradient from `|0⟩⊗N`.
 
-**Current results (NB01–NB06):**
+**Current results (NB01–NB07):**
 - DMRG reference (TeNPy): E₀ = −1.4219 (N=9), −1.4804 (N=12), −1.4996 (N=18), −1.5094 (N=24)
+- NQS reference (NetKet complex RBM): N=9 err **0.005%**, N=12 **0.018%** vs ED (`method_comparison.csv`)
 - COBYLA/HEA (N=9): best E₀ = −1.28456 (9.66% vs DMRG); mean ± std = −1.23572 ± 0.02853 (5 seeds)
 - Mean single-site entropy: 0.9066 bits (near-maximal spin liquid signature)
 - Sublattice MI I(A:B): 3.689 bits

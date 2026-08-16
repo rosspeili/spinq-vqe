@@ -51,11 +51,12 @@ spinq-vqe/
 │   ├── utils.py         # Publication-quality plot helpers
 │   ├── surrogate.py     # MLP surrogate for spin Hall angle prediction
 │   ├── qaoa.py          # QAOA circuit + optimizer for material selection
-│   └── dmrg.py          # TeNPy DMRG reference energies (NB06)
+│   ├── dmrg.py          # TeNPy DMRG reference energies (NB06)
+│   └── nqs.py           # NetKet Neural Quantum State baselines (NB07)
 ├── notebooks/           # Executable research notebooks
 ├── figures/             # Generated plots
-├── data/                # ED/VQE/QAOA CSVs, mp_theta_sh.csv, statevectors
-├── scripts/             # fetch_mp_theta_sh.py — refresh MP dataset (optional)
+├── data/                # ED/VQE/QAOA/DMRG/NQS CSVs, mp_theta_sh.csv, statevectors
+├── scripts/             # Benchmarks + fetch_mp_theta_sh.py
 ├── docs/                # Guides and API reference → docs/README.md
 ├── OVERVIEW.md          # Full program description + research context
 └── REFERENCES.md        # Full bibliography (50+ references)
@@ -78,7 +79,8 @@ conda activate spinq-vqe
 
 Requires Python ≥ 3.11. Core: `pennylane ≥ 0.39`, `numpy`, `scipy`, `networkx`, `matplotlib`.  
 Optional: `pip install -e ".[data]"` adds `scikit-learn`, `mp-api`, `pandas` (for SOC QAOA notebooks).  
-Optional: `pip install -e ".[dmrg]"` adds `physics-tenpy` (for DMRG comparison, NB06).
+Optional: `pip install -e ".[dmrg]"` adds `physics-tenpy` (for DMRG comparison, NB06).  
+Optional: `pip install -e ".[nqs]"` adds `netket` (for Neural Quantum State comparison, NB07).
 
 **SOC QAOA data (NB04):** uses committed `data/mp_theta_sh.csv` (no API key needed). To refresh from Materials Project:
 
@@ -98,6 +100,7 @@ python scripts/fetch_mp_theta_sh.py
 | 04 | [`04_soc_qaoa.ipynb`](notebooks/04_soc_qaoa.ipynb) | surrogate MLP, QAOA p=1/2/3, material ranking, landscape diagnostic |
 | 05 | [`05_scaling_analysis.ipynb`](notebooks/05_scaling_analysis.ipynb) | N=9/12/18 scaling, gradient variance, barren plateau |
 | 06 | [`06_dmrg_comparison.ipynb`](notebooks/06_dmrg_comparison.ipynb) | TeNPy DMRG vs ED/VQE, χ convergence, entanglement profile |
+| 07 | [`07_nqs_comparison.ipynb`](notebooks/07_nqs_comparison.ipynb) | NetKet NQS (complex RBM / RBMModPhase) vs ED/DMRG/VQE |
 
 ## Key results
 
@@ -114,6 +117,17 @@ VQE errors are quoted relative to DMRG E₀.
 | 12 | — | — | — | −1.48041803 | — | DMRG reference |
 | 18 | — | — | — | −1.49962859 | — | DMRG = ED, gap Δ = 0.037 |
 | 24 | — | — | — | −1.50936790 | — | DMRG only (beyond ED) |
+
+### Neural Quantum State baseline (NetKet, NB07)
+
+Same normalized strip Hamiltonian as ED/DMRG/VQE. Complex RBM recovers the ground state; VQE remains ansatz-limited. Full figure set lives in [`docs/notebooks.md`](docs/notebooks.md#07--nqs-comparison-netket) and NB07.
+
+| N | NQS RBM E₀ | err vs ED | NQS ModPhase err | VQE best err |
+|---|------------|-----------|------------------|--------------|
+| 9 | −1.42183147 | **0.005%** | 0.006% | 9.66% |
+| 12 | −1.48015452 | **0.018%** | 1.99% | 16.33% |
+
+<img src="figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE on Kagome strip" width="720">
 
 Adam / HEA d=3 at N=9 stalls at +0.141 (barren plateau). COBYLA mean ± std and per-seed
 distributions are in `data/vqe_results.csv`, `data/vqe_seeds_n9.csv`, and
@@ -165,7 +179,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-Six test modules covering all library functions. Runs in under 90 seconds on CPU. See [`docs/testing.md`](docs/testing.md) for the full guide.
+Core suite covers kagome/ansatz/VQE/entanglement/surrogate/QAOA (under ~90 s on CPU). Optional `[dmrg]` / `[nqs]` modules skip when those extras are not installed. See [`docs/testing.md`](docs/testing.md).
 
 ## Docs
 
@@ -176,7 +190,7 @@ Six test modules covering all library functions. Runs in under 90 seconds on CPU
 ## References
 
 See [`REFERENCES.md`](REFERENCES.md) for the full bibliography.  
-Key: Sachdev (1992), Yan/Huse/White (2011), Wiersema et al. (2020), Kandala et al. (2017), Cerezo et al. (2021), Farhi et al. (2014).
+Key: Sachdev (1992), Yan/Huse/White (2011), Carleo/Troyer (2017), Wiersema et al. (2020), Kandala et al. (2017), Cerezo et al. (2021), Farhi et al. (2014).
 
 ## Citation
 

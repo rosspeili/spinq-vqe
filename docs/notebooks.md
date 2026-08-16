@@ -266,6 +266,45 @@ Regenerate committed figures and CSV via `python scripts/run_dmrg_benchmark.py`.
 
 ---
 
+## 07 — NQS Comparison (NetKet)
+
+**File:** [`07_nqs_comparison.ipynb`](../notebooks/07_nqs_comparison.ipynb)  
+**Install:** `pip install -e ".[nqs]"`  
+**What it does:**
+- Builds the Kagome strip Hamiltonian in NetKet matching `kagome.heisenberg_kagome_hamiltonian`
+- Optimizes complex RBM and RBMModPhase wavefunctions (exact full-summation VMC for N≤12)
+- Documents why real-valued RBMs fail on this frustrated strip (sign structure)
+- Four-way comparison: ED / DMRG / NQS / VQE on the same normalized energies
+- Saves `data/method_comparison.csv` and NQS-only figures (does not overwrite DMRG artifacts)
+
+**Key outputs:**
+- `figures/nqs_vmc_convergence.png`
+- `figures/nqs_method_comparison.png`
+- `figures/nqs_error_vs_ed.png`
+- `data/method_comparison.csv`
+- `data/nqs_*_history_n{9,12}.csv`
+
+**Results (complex RBM / RBMModPhase, exact full-summation):**
+
+| N | ED / DMRG | NQS RBM | RBM err | ModPhase err | VQE err |
+|---|-----------|---------|---------|--------------|---------|
+| 9 | −1.4219 | −1.4218 | **0.005%** | 0.006% | 9.66% |
+| 12 | −1.4804 | −1.4802 | **0.018%** | 1.99% | 16.33% |
+
+Regenerate committed figures and CSV via `python scripts/run_nqs_benchmark.py`.
+
+<table>
+<tr>
+<td><img src="../figures/nqs_vmc_convergence.png" alt="NQS convergence" width="100%"></td>
+<td><img src="../figures/nqs_error_vs_ed.png" alt="NQS vs VQE error" width="100%"></td>
+</tr>
+<tr>
+<td colspan="2"><img src="../figures/nqs_method_comparison.png" alt="ED DMRG NQS VQE" width="100%"></td>
+</tr>
+</table>
+
+---
+
 ## Running a specific notebook
 
 ```bash

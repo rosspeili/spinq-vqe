@@ -8,6 +8,14 @@ and this project uses semantic versioning through the package version in
 
 ## [Unreleased]
 
+### Added
+
+- Neural Quantum State comparison via NetKet (`spinq_vqe.nqs`, NB07, `data/method_comparison.csv`) (#9).
+- Optional dependency group `[nqs]` with `netket`.
+- Figures: `nqs_vmc_convergence.png`, `nqs_method_comparison.png`, `nqs_error_vs_ed.png`.
+- Script `scripts/run_nqs_benchmark.py` to regenerate NB07 outputs (append-only; does not modify DMRG figures).
+- Convergence histories as CSV (`data/nqs_*_history_n*.csv`) for notebook figure regeneration.
+
 ## [0.1.5] - 2026-08-06
 
 ### Added
